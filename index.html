@@ -4,15 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TaskFlow — Quản Lý Đơn Hàng</title>
+<link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/1/1f/Windows_Task_Manager_Icon_%282024%29.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0e0e10;--s1:#18181b;--s2:#1f1f23;--s3:#27272b;--s4:#313136;
-  --bd:#2a2a2f;--bd2:#38383f;
-  --t1:#e8e8ea;--t2:#8e8e9a;--t3:#52525c;
-  --acc:#f59e0b;--acc2:#d97706;
-  --blue:#60a5fa;--green:#4ade80;--orange:#fb923c;--red:#f87171;
+  --bg:#061018;--s1:#0b1724;--s2:#112233;--s3:#163047;--s4:#1d3f5c;
+  --bd:#173047;--bd2:#24506f;
+  --t1:#e6f4ff;--t2:#8aa4ba;--t3:#59748b;
+  --acc:#1d8fcb;--acc2:#146e9d;
+  --blue:#59b8e8;--green:#3fd6b1;--orange:#f59e0b;--red:#fb7185;
   --r:8px;--r2:12px;
   --font:'Be Vietnam Pro',sans-serif;
 }
@@ -27,7 +28,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);min-height:100
 /* HEADER */
 .hdr{display:flex;align-items:center;gap:12px;padding:0 20px;height:54px;border-bottom:1px solid var(--bd);background:var(--s1);flex-shrink:0}
 .logo{font-size:15px;font-weight:800;color:var(--t1);letter-spacing:-.03em;display:flex;align-items:center;gap:8px;cursor:default;user-select:none}
-.logo-ico{width:26px;height:26px;background:var(--acc);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#000;font-weight:800}
+.logo-ico{width:26px;height:26px;border-radius:6px;display:block;object-fit:contain;box-shadow:0 4px 16px rgba(0,0,0,.28)}
 .hdrsep{width:1px;height:18px;background:var(--bd2);flex-shrink:0}
 .hdr-r{display:flex;align-items:center;gap:6px;margin-left:auto}
 .vtog{display:flex;background:var(--s2);border-radius:6px;padding:2px;gap:2px}
@@ -55,7 +56,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);min-height:100
 .sbox input::placeholder{color:var(--t3)}
 .spacer{flex:1}
 .btn{height:32px;padding:0 13px;border-radius:6px;border:none;font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.15s;white-space:nowrap}
-.btn-p{background:var(--acc);color:#000}
+.btn-p{background:var(--acc);color:#fff}
 .btn-p:hover{background:var(--acc2)}
 .btn-g{background:var(--s2);color:var(--t2);border:1px solid var(--bd)}
 .btn-g:hover{background:var(--s3);color:var(--t1)}
@@ -93,6 +94,7 @@ tr.drow:hover .acts{opacity:1}
 .b-doing{background:rgba(96,165,250,.12);color:#60a5fa}
 .b-review{background:rgba(251,146,60,.12);color:#fb923c}
 .b-paid{background:rgba(74,222,128,.12);color:#4ade80}
+.b-cancelled{background:rgba(251,113,133,.12);color:#fb7185}
 
 /* EMPTY */
 .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:260px;color:var(--t3);gap:10px}
@@ -104,7 +106,7 @@ tr.drow:hover .acts{opacity:1}
 ═══════════════════════════════════════ */
 .kview{flex:1;overflow-x:auto;padding:14px 20px 20px;display:flex;gap:12px;align-items:flex-start}
 .kcol{flex-shrink:0;width:276px;background:var(--s1);border-radius:var(--r2);border:1px solid var(--bd);display:flex;flex-direction:column;max-height:calc(100vh - 200px);transition:border-color .2s,background .2s}
-.kcol.drag-over{border-color:var(--acc);background:rgba(245,158,11,.05)}
+.kcol.drag-over{border-color:var(--acc);background:rgba(59,130,246,.06)}
 .kcol-hd{padding:12px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;flex-shrink:0;user-select:none}
 .kcol-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 .kcol-title{font-size:13px;font-weight:600}
@@ -116,7 +118,7 @@ tr.drow:hover .acts{opacity:1}
 .kcard:active{cursor:grabbing}
 .kcard:hover{background:var(--s3);border-color:var(--bd2);box-shadow:0 4px 16px rgba(0,0,0,.3)}
 .kcard.dragging{opacity:.35;transform:scale(.97);cursor:grabbing}
-.kcard.drag-placeholder{background:rgba(245,158,11,.07);border:1px dashed var(--acc);opacity:.7}
+.kcard.drag-placeholder{background:rgba(59,130,246,.08);border:1px dashed var(--acc);opacity:.7}
 
 .kcard-title{font-size:13px;font-weight:600;margin-bottom:5px;color:var(--t1);line-height:1.4}
 .kcard-cust{font-size:11px;color:var(--t2);margin-bottom:9px;display:flex;align-items:center;gap:4px}
@@ -157,7 +159,7 @@ tr.drow:hover .acts{opacity:1}
 
 /* FILE UPLOAD */
 .fupload{border:1px dashed var(--bd2);border-radius:6px;padding:14px;text-align:center;cursor:pointer;transition:.15s;position:relative}
-.fupload:hover{border-color:var(--acc);background:rgba(245,158,11,.04)}
+.fupload:hover{border-color:var(--acc);background:rgba(59,130,246,.05)}
 .fupload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .fupload-txt{font-size:12px;color:var(--t2)}
 .fupload-txt strong{display:block;font-size:13px;color:var(--t1);margin-bottom:2px}
@@ -172,6 +174,13 @@ tr.drow:hover .acts{opacity:1}
 .stabs{display:flex;gap:2px;background:var(--s2);border-radius:6px;padding:2px;margin-bottom:8px;width:fit-content}
 .stab{padding:4px 13px;border-radius:4px;border:none;background:transparent;color:var(--t2);font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;transition:.15s}
 .stab.active{background:var(--s3);color:var(--t1)}
+.qrpay{display:flex;flex-direction:column;gap:12px;background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:14px}
+.qrpay img{width:100%;max-width:320px;border-radius:12px;border:1px solid var(--bd2);background:#fff;align-self:center}
+.qrpay-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.qrpay-card{background:rgba(255,255,255,.02);border:1px solid var(--bd);border-radius:10px;padding:10px 12px}
+.qrpay-card b{display:block;font-size:11px;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.qrpay-card span{font-size:13px;color:var(--t1);line-height:1.5}
+.qrpay-note{font-size:12px;color:var(--t2);line-height:1.6}
 
 /* DETAIL MODAL */
 .doverlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;opacity:0;visibility:hidden;transition:.2s}
@@ -182,12 +191,19 @@ tr.drow:hover .acts{opacity:1}
 .dhd-info{flex:1}
 .dtitle{font-size:19px;font-weight:800;margin-bottom:6px;letter-spacing:-.02em}
 .dmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.dbody{padding:20px 24px;overflow-y:auto;flex:1}
+.dbody{padding:20px 24px;overflow-y:auto;flex:1;background:linear-gradient(180deg,rgba(255,255,255,.015),rgba(255,255,255,0))}
 .dgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.dsec{display:flex;flex-direction:column;gap:5px}
+.dsec{display:flex;flex-direction:column;gap:8px;background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px 15px;box-shadow:inset 0 1px 0 rgba(255,255,255,.02)}
 .dsec.full{grid-column:span 2}
-.dsec-lbl{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em}
-.dsec-val{font-size:13px;color:var(--t1);line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.dsec-lbl{font-size:10px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:.09em}
+.dsec-val{font-size:14px;color:var(--t1);line-height:1.75;white-space:pre-wrap;word-break:break-word}
+.dsec-val.muted{color:var(--t2)}
+.dqr{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.dqr img{width:100%;max-width:280px;border-radius:12px;border:1px solid var(--bd2);background:#fff}
+.dlinks{display:flex;flex-direction:column;gap:8px}
+.dlink{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.02);border:1px solid var(--bd);border-radius:10px;padding:8px 10px;color:var(--blue);text-decoration:none;font-size:13px}
+.dlink:hover{background:var(--s3);border-color:var(--bd2)}
+.dlink small{color:var(--t2);margin-left:auto}
 .dfooter{padding:14px 24px;border-top:1px solid var(--bd);display:flex;gap:8px;flex-shrink:0;align-items:center}
 
 /* STATUS SELECT */
@@ -198,6 +214,7 @@ tr.drow:hover .acts{opacity:1}
 .sopt.doing.on{background:rgba(96,165,250,.16);color:#60a5fa;border-color:rgba(96,165,250,.25)}
 .sopt.review.on{background:rgba(251,146,60,.16);color:#fb923c;border-color:rgba(251,146,60,.25)}
 .sopt.paid.on{background:rgba(74,222,128,.16);color:#4ade80;border-color:rgba(74,222,128,.25)}
+.sopt.cancelled.on{background:rgba(251,113,133,.16);color:#fb7185;border-color:rgba(251,113,133,.25)}
 
 /* SETTINGS PANEL */
 .sp{position:fixed;right:0;top:0;bottom:0;width:310px;background:var(--s1);border-left:1px solid var(--bd2);z-index:999;display:flex;flex-direction:column;transform:translateX(100%);transition:.25s;box-shadow:-8px 0 40px rgba(0,0,0,.5)}
@@ -224,6 +241,24 @@ tr.drow:hover .acts{opacity:1}
 .toast.warn{border-left:3px solid var(--orange)}
 @keyframes tin{from{transform:translateX(30px);opacity:0}to{transform:none;opacity:1}}
 @keyframes tout{to{transform:translateX(30px);opacity:0}}
+
+/* FINANCE */
+.fview{flex:1;overflow:auto;padding:0 20px 20px;display:none}
+.fpanel{background:var(--s1);border:1px solid var(--bd);border-radius:14px;overflow:hidden}
+.fpanel-hd{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--bd);background:linear-gradient(180deg,rgba(89,184,232,.06),rgba(89,184,232,0))}
+.fpanel-title{font-size:15px;font-weight:700}
+.fpanel-sub{font-size:12px;color:var(--t2)}
+.fsummary{display:flex;gap:8px;flex-wrap:wrap}
+.fsch{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;min-width:150px}
+.fsch b{display:block;font-size:11px;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.fsch span{font-size:14px;font-weight:700;color:var(--t1)}
+.finance-table{width:100%;border-collapse:collapse;min-width:940px}
+.finance-table td,.finance-table th{padding:11px 12px}
+.finance-yes{color:var(--green);font-weight:700}
+.finance-no{color:var(--orange);font-weight:700}
+.mini-link{color:var(--blue);text-decoration:none}
+.mini-link:hover{text-decoration:underline}
+.paytoggle{min-width:94px;justify-content:center}
 </style>
 </head>
 <body>
@@ -232,13 +267,14 @@ tr.drow:hover .acts{opacity:1}
 
 <!-- HEADER -->
 <header class="hdr">
-  <div class="logo"><div class="logo-ico">✦</div> TaskFlow</div>
+  <div class="logo"><img class="logo-ico" src="https://upload.wikimedia.org/wikipedia/commons/1/1f/Windows_Task_Manager_Icon_%282024%29.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" alt="TaskFlow logo"> TaskFlow</div>
   <div class="hdrsep"></div>
   <span style="font-size:12px;color:var(--t2)" id="hdr-count">—</span>
   <div class="hdr-r">
     <div class="vtog">
       <button class="vbtn active" id="btn-table" onclick="app.setView('table')">⊞ Bảng</button>
       <button class="vbtn" id="btn-kanban" onclick="app.setView('kanban')">⬛ Kanban</button>
+      <button class="vbtn" id="btn-finance" onclick="app.setView('finance')">₫ Thu chi</button>
     </div>
     <button class="icobtn" onclick="app.toggleSettings()" title="Cài đặt & Telegram">⚙</button>
   </div>
@@ -285,6 +321,38 @@ tr.drow:hover .acts{opacity:1}
 
   <!-- KANBAN VIEW -->
   <div class="kview" id="kanban-view" style="display:none"></div>
+
+  <!-- FINANCE VIEW -->
+  <div class="fview" id="finance-view">
+    <div class="fpanel">
+      <div class="fpanel-hd">
+        <div>
+          <div class="fpanel-title">Theo dõi thu chi</div>
+          <div class="fpanel-sub">Theo dõi ngày nhận tiền, khách hàng, đề bài và trạng thái đã nhận.</div>
+        </div>
+        <div class="fsummary" id="finance-summary"></div>
+      </div>
+      <table class="finance-table">
+        <thead>
+          <tr>
+            <th>Ngày nhận</th>
+            <th>Khách hàng</th>
+            <th>Đề tài</th>
+            <th>Số tiền</th>
+            <th>Trạng thái đơn</th>
+            <th>Đã nhận?</th>
+            <th>Ghi chú / File</th>
+            <th style="width:120px"></th>
+          </tr>
+        </thead>
+        <tbody id="finance-body"></tbody>
+      </table>
+      <div class="empty" id="finance-empty" style="display:none">
+        <div class="empty-ico">💸</div>
+        <p>Chưa có dữ liệu thu chi</p>
+      </div>
+    </div>
+  </div>
 </div>
 </div>
 
@@ -323,7 +391,9 @@ tr.drow:hover .acts{opacity:1}
       <b style="color:var(--t1)">Cách lấy Bot Token:</b><br>
       1. Nhắn <code style="color:var(--acc)">/newbot</code> cho <a href="https://t.me/BotFather" target="_blank">@BotFather</a><br>
       2. Copy token được cấp<br>
-      3. Lấy Chat ID qua <a href="https://t.me/userinfobot" target="_blank">@userinfobot</a>
+      3. Nhắn <code style="color:var(--acc)">/start</code> cho bot của bạn trước<br>
+      4. Lấy Chat ID qua <a href="https://t.me/userinfobot" target="_blank">@userinfobot</a> hoặc <code style="color:var(--acc)">getUpdates</code><br>
+      <span style="display:block;margin-top:8px">Lưu ý: <code style="color:var(--acc)">chat_id</code> không phải là <code style="color:var(--acc)">bot id</code>.</span>
     </div>
     <div>
       <div class="sp-sec-title">Dữ liệu</div>
@@ -355,16 +425,28 @@ tr.drow:hover .acts{opacity:1}
         <div class="fg full"><label class="flbl">Đề bài *</label><input class="fi" id="f-title" placeholder="Tên đề bài / dự án"></div>
         <div class="fg full"><label class="flbl">Mô tả chi tiết</label><textarea class="fta" id="f-desc" placeholder="Mô tả yêu cầu..."></textarea></div>
         <div class="fg"><label class="flbl">Deadline</label><input class="fi" id="f-dur" type="date"></div>
-        <div class="fg"><label class="flbl">Giá (VNĐ)</label><input class="fi" id="f-price" type="number" placeholder="500000"></div>
+        <div class="fg"><label class="flbl">Giá (VNĐ)</label><input class="fi" id="f-price" type="text" inputmode="numeric" placeholder="500.000.000" oninput="app.formatPrice(this)"></div>
         <div class="fg full"><label class="flbl">Ghi chú nội bộ</label><textarea class="fta" id="f-notes" placeholder="Ghi chú..."></textarea></div>
         <div class="fg">
           <label class="flbl">Trạng thái</label>
-          <select class="fsel" id="f-status">
+          <select class="fsel" id="f-status" onchange="app.syncPaymentFields('status')">
             <option value="todo">⬜ Chưa làm</option>
             <option value="doing">🔵 Đang làm</option>
             <option value="review">🟡 Đang review</option>
             <option value="paid">🟢 Đã thanh toán</option>
+            <option value="cancelled">🔴 Hủy</option>
           </select>
+        </div>
+        <div class="fg">
+          <label class="flbl">Đã nhận tiền?</label>
+          <select class="fsel" id="f-payment-received" onchange="app.syncPaymentFields('payment')">
+            <option value="no">Chưa nhận</option>
+            <option value="yes">Đã nhận</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label class="flbl">Ngày nhận tiền</label>
+          <input class="fi" id="f-payment-date" type="date">
         </div>
       </div>
       <div class="frow">
@@ -383,6 +465,7 @@ tr.drow:hover .acts{opacity:1}
           <div class="stabs">
             <button class="stab active" id="sub-tab-text" onclick="app.switchSubTab('text')">Văn bản / Link</button>
             <button class="stab" id="sub-tab-file" onclick="app.switchSubTab('file')">File đính kèm</button>
+            <button class="stab" id="sub-tab-qr" onclick="app.switchSubTab('qr')">QR thanh toán</button>
           </div>
           <div id="sub-text-area"><textarea class="fta" id="f-sub-text" placeholder="Link Google Drive, nội dung đã gửi..."></textarea></div>
           <div id="sub-file-area" style="display:none">
@@ -391,6 +474,30 @@ tr.drow:hover .acts{opacity:1}
               <div class="fupload-txt"><strong>File bài gửi cho khách</strong>Tối đa 10MB / file</div>
             </div>
             <div class="flist" id="sub-list"></div>
+          </div>
+          <div id="sub-qr-area" style="display:none">
+            <div class="qrpay">
+              <img src="1778783399205.png" alt="QR thanh toán">
+              <div class="qrpay-meta">
+                <div class="qrpay-card">
+                  <b>Ngân hàng</b>
+                  <span>VPBank</span>
+                </div>
+                <div class="qrpay-card">
+                  <b>Chủ tài khoản</b>
+                  <span>NGUYEN QUOC HUY</span>
+                </div>
+                <div class="qrpay-card">
+                  <b>Số tài khoản</b>
+                  <span>088****008</span>
+                </div>
+                <div class="qrpay-card">
+                  <b>Mục đích</b>
+                  <span>Khách có thể quét để thanh toán cho đơn này.</span>
+                </div>
+              </div>
+              <div class="qrpay-note">Tab này là QR thanh toán tham chiếu. Chọn tab này rồi bấm lưu đơn để phần chi tiết hiển thị ảnh QR thanh toán.</div>
+            </div>
           </div>
         </div>
       </div>
@@ -438,6 +545,7 @@ const STATUSES = {
   doing:  { label:'Đang làm',    dot:'#60a5fa', cls:'b-doing',  emoji:'🔵' },
   review: { label:'Đang review', dot:'#fb923c', cls:'b-review', emoji:'🟡' },
   paid:   { label:'Đã thanh toán',dot:'#4ade80',cls:'b-paid',   emoji:'🟢' },
+  cancelled:{ label:'Hủy',       dot:'#fb7185', cls:'b-cancelled', emoji:'🔴' },
 };
 
 /* ═══════════════════════════════════════
@@ -453,7 +561,11 @@ const writeAll = (tasks) => localStorage.setItem(STORAGE_KEY, JSON.stringify(tas
 
 const API = {
   async get() {
-    return readAll();
+    return readAll().map(task => ({
+      paymentReceived: false,
+      paymentReceivedDate: '',
+      ...task,
+    }));
   },
   async create(data) {
     const tasks = readAll();
@@ -477,6 +589,10 @@ const API = {
     if (idx === -1) throw new Error('Not found');
     const old = tasks[idx].status;
     tasks[idx].status = s;
+    if (s === 'paid') {
+      tasks[idx].paymentReceived = true;
+      tasks[idx].paymentReceivedDate = tasks[idx].paymentReceivedDate || todayLocal();
+    }
     tasks[idx].updatedAt = new Date().toISOString();
     writeAll(tasks);
     return { task: tasks[idx], old };
@@ -529,12 +645,15 @@ const app = {
 
   getFiltered() {
     return this.tasks.filter(t => {
-      if (this.filter !== 'all' && t.status !== this.filter) return false;
+      if (this.filter === 'received') {
+        if (!t.paymentReceived) return false;
+      } else if (this.filter !== 'all' && t.status !== this.filter) return false;
       if (this.search) {
         const q = this.search.toLowerCase();
         if (!(t.customerName||'').toLowerCase().includes(q) &&
             !(t.title||'').toLowerCase().includes(q) &&
-            !(t.notes||'').toLowerCase().includes(q)) return false;
+            !(t.notes||'').toLowerCase().includes(q) &&
+            !(t.customerEmail||'').toLowerCase().includes(q)) return false;
       }
       return true;
     });
@@ -542,18 +661,21 @@ const app = {
 
   render() {
     const filtered = this.getFiltered();
-    document.getElementById('hdr-count').textContent = this.tasks.length + ' đơn hàng';
+    document.getElementById('hdr-count').textContent = this.view === 'finance' ? this.getFinanceRows().length + ' dòng thu chi' : this.tasks.length + ' đơn hàng';
     this.renderStats();
     if (this.view === 'table') this.renderTable(filtered);
-    else this.renderKanban();
+    else if (this.view === 'kanban') this.renderKanban();
+    else this.renderFinance();
   },
 
   renderStats() {
-    const counts = { all: this.tasks.length, todo:0, doing:0, review:0, paid:0 };
+    const counts = { all: this.tasks.length, todo:0, doing:0, review:0, paid:0, cancelled:0 };
     let totalPaid = 0;
+    let totalReceived = 0;
     this.tasks.forEach(t => {
       counts[t.status] = (counts[t.status]||0) + 1;
       if (t.status === 'paid') totalPaid += parseFloat(t.price||0);
+      if (t.paymentReceived) totalReceived += parseFloat(t.price||0);
     });
     const items = [
       { key:'all', label:'Tất cả', dot:'#52525c' },
@@ -561,12 +683,14 @@ const app = {
       { key:'doing', label:'Đang làm', dot:STATUSES.doing.dot },
       { key:'review', label:'Đang review', dot:STATUSES.review.dot },
       { key:'paid', label:'Đã thanh toán', dot:STATUSES.paid.dot, val:totalPaid },
+      { key:'cancelled', label:'Hủy', dot:STATUSES.cancelled.dot },
+      { key:'received', label:'Đã nhận tiền', dot:'#3fd6b1', val:totalReceived, special:true },
     ];
     document.getElementById('stats-bar').innerHTML = items.map(i => `
       <div class="stitem${this.filter===i.key?' active':''}" onclick="app.setFilter('${i.key}')">
         <span class="dot" style="background:${i.dot}"></span>
         <span class="lbl">${i.label}</span>
-        <span class="cnt">${counts[i.key]||0}</span>
+        <span class="cnt">${i.special ? this.tasks.filter(t => t.paymentReceived).length : (counts[i.key]||0)}</span>
         ${i.val ? `<span class="val">${this.fmt(i.val)}</span>` : ''}
       </div>
     `).join('');
@@ -592,6 +716,58 @@ const app = {
             <button class="btn btn-g btn-sm" onclick="app.openEdit('${t.id}')">✏</button>
             <button class="btn btn-d btn-sm" onclick="app.confirmDelete('${t.id}')">✕</button>
           </div>
+        </td>
+      </tr>
+    `).join('');
+  },
+
+  getFinanceRows() {
+    return this.tasks
+      .filter(t => t.price || t.paymentReceived || t.status === 'paid')
+      .filter(t => {
+        if (this.search) {
+          const q = this.search.toLowerCase();
+          if (!(t.customerName||'').toLowerCase().includes(q) &&
+              !(t.title||'').toLowerCase().includes(q) &&
+              !(t.notes||'').toLowerCase().includes(q)) return false;
+        }
+        if (this.filter === 'received') return !!t.paymentReceived;
+        if (this.filter !== 'all' && this.filter !== 'received') return t.status === this.filter;
+        return true;
+      })
+      .sort((a,b) => {
+        const da = a.paymentReceivedDate || a.updatedAt || a.createdAt || '';
+        const db = b.paymentReceivedDate || b.updatedAt || b.createdAt || '';
+        return db.localeCompare(da);
+      });
+  },
+
+  renderFinance() {
+    const rows = this.getFinanceRows();
+    const tbody = document.getElementById('finance-body');
+    const empty = document.getElementById('finance-empty');
+    const total = rows.reduce((sum, t) => sum + Number(t.price || 0), 0);
+    const received = rows.filter(t => t.paymentReceived).reduce((sum, t) => sum + Number(t.price || 0), 0);
+    const pending = rows.filter(t => !t.paymentReceived).reduce((sum, t) => sum + Number(t.price || 0), 0);
+    document.getElementById('finance-summary').innerHTML = `
+      <div class="fsch"><b>Tổng đơn</b><span>${rows.length}</span></div>
+      <div class="fsch"><b>Tổng giá trị</b><span>${this.fmt(total)}</span></div>
+      <div class="fsch"><b>Đã nhận</b><span>${this.fmt(received)}</span></div>
+      <div class="fsch"><b>Chưa nhận</b><span>${this.fmt(pending)}</span></div>
+    `;
+    if (!rows.length) { tbody.innerHTML = ''; empty.style.display = 'flex'; return; }
+    empty.style.display = 'none';
+    tbody.innerHTML = rows.map(t => `
+      <tr class="drow" onclick="app.openDetail('${t.id}')">
+        <td>${this.fmtDate(t.paymentReceivedDate || t.updatedAt || t.createdAt)}</td>
+        <td class="cust-cell"><strong>${esc(t.customerName||'—')}</strong><span>${esc(t.customerPhone||t.customerEmail||'')}</span></td>
+        <td class="title-c">${esc(t.title||'—')}</td>
+        <td class="price-c">${this.fmt(t.price || 0)}</td>
+        <td><span class="badge ${STATUSES[t.status]?.cls||'b-todo'}">${STATUSES[t.status]?.label||'—'}</span></td>
+        <td><span class="${t.paymentReceived ? 'finance-yes' : 'finance-no'}">${t.paymentReceived ? 'Đã nhận' : 'Chưa nhận'}</span></td>
+        <td style="max-width:280px;color:var(--t2);font-size:12px">${esc(this.buildFinanceInfo(t))}</td>
+        <td onclick="event.stopPropagation()">
+          <button class="btn ${t.paymentReceived ? 'btn-g' : 'btn-p'} btn-sm paytoggle" onclick="app.togglePaymentReceived('${t.id}');event.stopPropagation()">${t.paymentReceived ? 'Hoàn tác' : 'Đã nhận'}</button>
         </td>
       </tr>
     `).join('');
@@ -695,6 +871,10 @@ const app = {
     const oldStatus = task.status;
     // Optimistic update
     task.status = newStatus;
+    if (newStatus === 'paid' && !task.paymentReceived) {
+      task.paymentReceived = true;
+      task.paymentReceivedDate = task.paymentReceivedDate || todayLocal();
+    }
     task.updatedAt = new Date().toISOString();
     this.render();
 
@@ -707,10 +887,10 @@ const app = {
       this.toast('ok', `✅ ${esc(task.title||'Đơn')}: ${STATUSES[oldStatus].label} → ${STATUSES[newStatus].label}`);
 
       if (this.settings.notiStatus) {
-        this.sendTelegram(`🔄 <b>Cập nhật trạng thái</b>\n👤 ${task.customerName}\n📌 ${task.title}\n${STATUSES[oldStatus].label} → ${STATUSES[newStatus].label}`);
+        this.notify(this.buildStatusNotice(task, oldStatus, newStatus));
       }
       if (this.settings.notiPaid && newStatus === 'paid' && oldStatus !== 'paid') {
-        this.sendTelegram(`🎉 <b>Đã thanh toán!</b>\n👤 ${task.customerName}\n📌 ${task.title}\n💰 ${this.fmt(task.price)}`);
+        this.notify(this.buildPaidNotice(task));
       }
     } catch(err) {
       // Rollback
@@ -725,8 +905,10 @@ const app = {
     this.view = v;
     document.getElementById('table-view').style.display = v === 'table' ? 'block' : 'none';
     document.getElementById('kanban-view').style.display = v === 'kanban' ? 'flex' : 'none';
+    document.getElementById('finance-view').style.display = v === 'finance' ? 'block' : 'none';
     document.getElementById('btn-table').className = 'vbtn' + (v === 'table' ? ' active' : '');
     document.getElementById('btn-kanban').className = 'vbtn' + (v === 'kanban' ? ' active' : '');
+    document.getElementById('btn-finance').className = 'vbtn' + (v === 'finance' ? ' active' : '');
     this.render();
   },
 
@@ -755,13 +937,14 @@ const app = {
     this.subTab = t.submissionType || 'text';
     document.getElementById('modal-title').textContent = 'Chỉnh sửa đơn hàng';
     document.getElementById('delete-btn').style.display = 'flex';
-    ['name','phone','email','social','title','desc','dur','notes','sub-text'].forEach(k => {
-      const map = {name:'customerName',phone:'customerPhone',email:'customerEmail',social:'customerSocial',title:'title',desc:'description',dur:'deadline',notes:'notes','sub-text':'submissionText'};
+    ['name','phone','email','social','title','desc','dur','notes','sub-text','payment-date'].forEach(k => {
+      const map = {name:'customerName',phone:'customerPhone',email:'customerEmail',social:'customerSocial',title:'title',desc:'description',dur:'deadline',notes:'notes','sub-text':'submissionText','payment-date':'paymentReceivedDate'};
       const el = document.getElementById('f-'+k);
       if (el) el.value = t[map[k]] || '';
     });
-    document.getElementById('f-price').value = t.price || '';
+    document.getElementById('f-price').value = t.price ? Number(t.price).toLocaleString('vi-VN') : '';
     document.getElementById('f-status').value = t.status || 'todo';
+    document.getElementById('f-payment-received').value = t.paymentReceived ? 'yes' : 'no';
     this.switchSubTab(this.subTab);
     this.renderFileList('attach', this.attachFiles);
     this.renderFileList('sub', this.subFiles);
@@ -769,12 +952,28 @@ const app = {
   },
 
   clearForm() {
-    ['f-name','f-phone','f-email','f-social','f-title','f-desc','f-dur','f-price','f-notes','f-sub-text'].forEach(id => {
+    ['f-name','f-phone','f-email','f-social','f-title','f-desc','f-dur','f-price','f-notes','f-sub-text','f-payment-date'].forEach(id => {
       const el = document.getElementById(id); if (el) el.value = '';
     });
     document.getElementById('f-status').value = 'todo';
+    document.getElementById('f-payment-received').value = 'no';
     this.renderFileList('attach', []);
     this.renderFileList('sub', []);
+  },
+
+  syncPaymentFields(source) {
+    const statusEl = document.getElementById('f-status');
+    const receivedEl = document.getElementById('f-payment-received');
+    const dateEl = document.getElementById('f-payment-date');
+    if (!statusEl || !receivedEl || !dateEl) return;
+    if (source === 'status' && statusEl.value === 'paid') {
+      receivedEl.value = 'yes';
+      if (!dateEl.value) dateEl.value = todayLocal();
+    }
+    if (source === 'payment') {
+      if (receivedEl.value === 'yes' && !dateEl.value) dateEl.value = todayLocal();
+      if (receivedEl.value === 'no') dateEl.value = '';
+    }
   },
 
   async saveTask() {
@@ -786,6 +985,10 @@ const app = {
     const btn = document.getElementById('save-btn');
     btn.innerHTML = '<span class="spin"></span> Đang lưu...';
     btn.disabled = true;
+    const selectedStatus = document.getElementById('f-status').value;
+    const paymentReceived = document.getElementById('f-payment-received').value === 'yes' || selectedStatus === 'paid';
+    const paymentDateInput = document.getElementById('f-payment-date').value;
+    const paymentReceivedDate = paymentReceived ? (paymentDateInput || todayLocal()) : '';
 
     const payload = {
       customerName:   name,
@@ -795,9 +998,11 @@ const app = {
       title,
       description:    document.getElementById('f-desc').value.trim(),
       deadline:       document.getElementById('f-dur').value,
-      price:          parseFloat(document.getElementById('f-price').value) || 0,
+      price:          Number(document.getElementById('f-price').value.replace(/\D/g,'')) || 0,
       notes:          document.getElementById('f-notes').value.trim(),
-      status:         document.getElementById('f-status').value,
+      status:         selectedStatus,
+      paymentReceived,
+      paymentReceivedDate,
       attachments:    this.attachFiles,
       submissionType: this.subTab,
       submissionText: document.getElementById('f-sub-text').value.trim(),
@@ -806,23 +1011,25 @@ const app = {
 
     try {
       if (this.editingId) {
-        const oldStatus = this.tasks.find(t => t.id === this.editingId)?.status;
+        const before = this.tasks.find(t => t.id === this.editingId);
+        const oldStatus = before?.status;
         const updated = await API.update(this.editingId, payload);
         const idx = this.tasks.findIndex(t => t.id === this.editingId);
         if (idx !== -1) this.tasks[idx] = updated;
         this.toast('ok', '✅ Đã lưu thay đổi');
+        this.notify(this.buildEditNotice(before, updated));
         if (this.settings.notiStatus && oldStatus && oldStatus !== updated.status) {
-          this.sendTelegram(`🔄 <b>Cập nhật trạng thái</b>\n👤 ${updated.customerName}\n📌 ${updated.title}\n${STATUSES[oldStatus].label} → ${STATUSES[updated.status].label}`);
+          this.notify(this.buildStatusNotice(updated, oldStatus, updated.status));
         }
         if (this.settings.notiPaid && updated.status === 'paid' && oldStatus !== 'paid') {
-          this.sendTelegram(`🎉 <b>Đã thanh toán!</b>\n👤 ${updated.customerName}\n📌 ${updated.title}\n💰 ${this.fmt(updated.price)}`);
+          this.notify(this.buildPaidNotice(updated));
         }
       } else {
         const created = await API.create(payload);
         this.tasks.unshift(created);
         this.toast('ok', '✅ Đã thêm đơn hàng mới');
         if (this.settings.notiNew) {
-          this.sendTelegram(`📋 <b>Đơn hàng mới</b>\n👤 ${created.customerName}\n📌 ${created.title}\n⏰ ${this.fmtDeadline(created.deadline)} | 💰 ${this.fmt(created.price)}`);
+          this.notify(this.buildNewNotice(created));
         }
       }
       this.render();
@@ -879,15 +1086,22 @@ const app = {
       { l:'Mạng XH / Link', v:t.customerSocial||'—' },
       { l:'Mô tả', v:t.description||'—', full:true },
       { l:'Deadline', v:this.fmtDeadline(t.deadline) },
-      { l:'Giá', v:t.price ? this.fmt(t.price)+'đ' : '—' },
+      { l:'Giá', v:t.price ? this.fmt(t.price) : '—' },
+      { l:'Đã nhận tiền', v:t.paymentReceived ? 'Đã nhận' : 'Chưa nhận' },
+      { l:'Ngày nhận tiền', v:t.paymentReceivedDate ? this.fmtDate(t.paymentReceivedDate) : '—' },
       { l:'Ghi chú', v:t.notes||'—', full:true },
-      { l:'File đi kèm', v:t.attachments?.length ? t.attachments.map(f=>`📎 ${esc(f.name)}`).join('\n') : 'Không có', full:true },
-      { l:'Bài gửi đi', v:t.submissionType==='text' ? (t.submissionText||'—') : (t.submissionFiles?.map(f=>`📄 ${esc(f.name)}`).join('\n')||'—'), full:true },
+      { l:'File đi kèm', v:t.attachments?.length ? t.attachments.map(f=>`📎 ${esc(f.name)}`).join('\n') : 'Không có', full:true, html:t.attachments?.length ? this.renderDownloadLinks(t.attachments, 'Tải file') : '' },
+      { l:'Bài gửi đi', v:t.submissionType==='text' ? (t.submissionText||'—') : t.submissionType==='file' ? (t.submissionFiles?.map(f=>`📄 ${esc(f.name)}`).join('\n')||'—') : 'QR thanh toán VPBank', full:true, qr:t.submissionType==='qr', html:t.submissionType==='file' && t.submissionFiles?.length ? this.renderDownloadLinks(t.submissionFiles, 'Tải file gửi') : '' },
     ];
     document.getElementById('d-content').innerHTML = fields.map(f => `
       <div class="dsec${f.full?' full':''}">
         <div class="dsec-lbl">${f.l}</div>
-        <div class="dsec-val">${esc(f.v)}</div>
+        ${f.qr ? `
+          <div class="dqr">
+            <div class="dsec-val">${esc(f.v)}</div>
+            <img src="1778783399205.png" alt="QR thanh toán">
+          </div>
+        ` : f.html ? f.html : `<div class="dsec-val${f.v==='—' || f.v==='Không có' ? ' muted' : ''}">${esc(f.v)}</div>`}
       </div>
     `).join('');
     document.getElementById('d-status-opts').innerHTML =
@@ -902,6 +1116,10 @@ const app = {
     if (!t) return;
     const old = t.status;
     t.status = status;
+    if (status === 'paid' && !t.paymentReceived) {
+      t.paymentReceived = true;
+      t.paymentReceivedDate = t.paymentReceivedDate || todayLocal();
+    }
     t.updatedAt = new Date().toISOString();
     try {
       await API.status(id, status);
@@ -909,9 +1127,9 @@ const app = {
       this.openDetail(id);
       this.toast('ok', `✅ Đổi sang: ${STATUSES[status].label}`);
       if (this.settings.notiStatus && old !== status)
-        this.sendTelegram(`🔄 <b>Cập nhật trạng thái</b>\n👤 ${t.customerName}\n📌 ${t.title}\n${STATUSES[old].label} → ${STATUSES[status].label}`);
+        this.notify(this.buildStatusNotice(t, old, status));
       if (this.settings.notiPaid && status === 'paid' && old !== 'paid')
-        this.sendTelegram(`🎉 <b>Đã thanh toán!</b>\n👤 ${t.customerName}\n📌 ${t.title}\n💰 ${this.fmt(t.price)}`);
+        this.notify(this.buildPaidNotice(t));
     } catch(e) {
       t.status = old;
       this.toast('err', '❌ Cập nhật thất bại');
@@ -965,8 +1183,10 @@ const app = {
     this.subTab = tab;
     document.getElementById('sub-tab-text').className = 'stab' + (tab==='text' ? ' active' : '');
     document.getElementById('sub-tab-file').className = 'stab' + (tab==='file' ? ' active' : '');
+    document.getElementById('sub-tab-qr').className = 'stab' + (tab==='qr' ? ' active' : '');
     document.getElementById('sub-text-area').style.display = tab==='text' ? 'block' : 'none';
     document.getElementById('sub-file-area').style.display = tab==='file' ? 'block' : 'none';
+    document.getElementById('sub-qr-area').style.display = tab==='qr' ? 'block' : 'none';
   },
 
   /* ─── SETTINGS ─── */
@@ -996,15 +1216,110 @@ const app = {
 
   async sendTelegram(msg) {
     const { token, chatid } = this.settings;
-    if (!token || !chatid) return;
+    if (!token || !chatid) return { ok:false, error:'Chưa có token/chat ID' };
     try {
       const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method:'POST', headers:{'Content-Type':'application/json'},
         body: JSON.stringify({ chat_id:chatid, text:msg, parse_mode:'HTML' })
       });
       const d = await r.json();
-      if (!d.ok) throw new Error(d.description);
-    } catch(e) { console.warn('Telegram:', e); }
+      if (!d.ok) return { ok:false, error: d.description || 'Telegram từ chối' };
+      return { ok:true };
+    } catch(e) {
+      return { ok:false, error: e.message || 'Network error' };
+    }
+  },
+
+  async notify(msg) {
+    if (!this.settings.token || !this.settings.chatid) return;
+    const r = await this.sendTelegram(msg);
+    if (!r.ok) {
+      console.warn('Telegram:', r.error);
+      this.toast('warn', '⚠ Telegram: ' + r.error);
+    }
+  },
+
+  async togglePaymentReceived(id) {
+    const t = this.tasks.find(x => x.id === id);
+    if (!t) return;
+    const nextReceived = !t.paymentReceived;
+    const updated = await API.update(id, {
+      paymentReceived: nextReceived,
+      paymentReceivedDate: nextReceived ? (t.paymentReceivedDate || todayLocal()) : '',
+      status: nextReceived && t.status !== 'cancelled' ? 'paid' : t.status,
+    });
+    const idx = this.tasks.findIndex(x => x.id === id);
+    if (idx !== -1) this.tasks[idx] = updated;
+    this.render();
+    if (this.viewingId === id) this.openDetail(id);
+    this.toast('ok', nextReceived ? '✅ Đã đánh dấu nhận tiền' : '↩ Đã chuyển về chưa nhận');
+  },
+
+  buildEditNotice(before, after) {
+    const task = after || before || {};
+    return `✏️ <b>Đơn hàng đã chỉnh sửa</b>\n${this.buildTaskTelegramBody(task)}`;
+  },
+
+  buildNewNotice(task) {
+    return `📋 <b>Đơn hàng mới</b>\n${this.buildTaskTelegramBody(task)}`;
+  },
+
+  buildPaidNotice(task) {
+    return `🎉 <b>Đã thanh toán</b>\n${this.buildTaskTelegramBody(task)}`;
+  },
+
+  buildStatusNotice(task, oldStatus, newStatus) {
+    return `🔄 <b>Cập nhật trạng thái</b>\n${this.buildTaskTelegramBody(task)}\nTrạng thái cũ: ${tgEsc(STATUSES[oldStatus]?.label || '—')}\nTrạng thái mới: ${tgEsc(STATUSES[newStatus]?.label || '—')}`;
+  },
+
+  buildTaskTelegramBody(task) {
+    const attachments = (task.attachments || []).map(f => f?.name).filter(Boolean);
+    const submissionFiles = (task.submissionFiles || []).map(f => f?.name).filter(Boolean);
+    const notes = this.pickTelegramText(task.notes);
+    const submission = task.submissionType === 'qr' ? 'QR thanh toán VPBank' : this.pickTelegramText(task.submissionText);
+    const fileInfo = [
+      attachments.length ? `File khách: ${attachments.join(', ')}` : '',
+      submissionFiles.length ? `File gửi: ${submissionFiles.join(', ')}` : '',
+      submission ? `Link/Nội dung gửi: ${submission}` : '',
+      notes ? `Ghi chú: ${notes}` : '',
+    ].filter(Boolean).join(' | ');
+
+    return [
+      `Khách hàng: ${tgEsc(task.customerName || '—')}`,
+      `Email: ${tgEsc(task.customerEmail || '—')}`,
+      `SĐT: ${tgEsc(task.customerPhone || '—')}`,
+      `Đề bài: ${tgEsc(task.title || '—')}`,
+      `Deadline: ${tgEsc(this.fmtDeadline(task.deadline) || '—')}`,
+      `Số tiền: ${tgEsc(this.fmt(task.price || 0))}`,
+      `Trạng thái: ${tgEsc(STATUSES[task.status]?.label || '—')}`,
+      `Đã nhận tiền: ${tgEsc(task.paymentReceived ? 'Đã nhận' : 'Chưa nhận')}`,
+      `Ngày nhận: ${tgEsc(task.paymentReceivedDate ? this.fmtDate(task.paymentReceivedDate) : '—')}`,
+      `File/Ghi chú: ${tgEsc(fileInfo || 'Không có')}`,
+    ].join('\n');
+  },
+
+  buildFinanceInfo(task) {
+    const parts = [];
+    if (task.submissionType === 'qr') parts.push('QR thanh toán VPBank');
+    else if (task.submissionText) parts.push(this.pickTelegramText(task.submissionText, 90));
+    if (task.attachments?.length) parts.push('File khách: ' + task.attachments.map(f => f.name).join(', '));
+    if (task.notes) parts.push('Note: ' + this.pickTelegramText(task.notes, 90));
+    return parts.join(' | ') || 'Không có';
+  },
+
+  renderDownloadLinks(files, labelPrefix) {
+    return `<div class="dlinks">${files.map((f, idx) => `
+      <a class="dlink" href="${escAttr(f.base64 || '#')}" download="${escAttr(f.name || `file-${idx+1}`)}" onclick="event.stopPropagation()">
+        <span>${labelPrefix} ${idx + 1}: ${esc(f.name || `file-${idx+1}`)}</span>
+        <small>${fmtSize(f.size || 0)}</small>
+      </a>
+    `).join('')}</div>`;
+  },
+
+  pickTelegramText(value, max = 160) {
+    const text = String(value || '').trim().replace(/\s+/g, ' ');
+    if (!text) return '';
+    return text.length > max ? text.slice(0, max - 1) + '…' : text;
   },
 
   async testTelegram() {
@@ -1012,18 +1327,18 @@ const app = {
     const { token, chatid } = this.settings;
     if (!token || !chatid) { this.toast('err', '❌ Điền token và chat ID trước'); return; }
     this.toast('inf', '📡 Đang gửi...');
-    const ok = await this.sendTelegram('✅ <b>TaskFlow</b>\nKết nối Telegram thành công!').then(()=>true).catch(()=>false);
-    ok
-      ? this.toast('ok', '✅ Telegram kết nối thành công!')
-      : this.toast('err', '❌ Gửi thất bại. Kiểm tra Token & Chat ID');
+    const r = await this.sendTelegram('✅ <b>TaskFlow</b>\nKết nối Telegram thành công!');
+    if (r.ok) this.toast('ok', '✅ Telegram kết nối thành công!');
+    else if ((r.error || '').includes('bot can\'t send messages to the bot')) this.toast('err', '❌ Chat ID đang là bot id. Hãy chat /start với bot rồi nhập chat ID cá nhân của bạn.');
+    else this.toast('err', '❌ Telegram: ' + r.error);
   },
 
   /* ─── EXPORT ─── */
   exportCSV() {
-    const h = ['ID','Khách hàng','Điện thoại','Email','Đề bài','Deadline','Giá','Trạng thái','Ghi chú','Ngày tạo'];
+    const h = ['ID','Khách hàng','Điện thoại','Email','Đề bài','Deadline','Giá','Trạng thái','Đã nhận tiền','Ngày nhận tiền','Ghi chú','Ngày tạo'];
     const rows = this.tasks.map(t => [
       t.id, t.customerName, t.customerPhone, t.customerEmail,
-      t.title, this.fmtDeadline(t.deadline), t.price, STATUSES[t.status]?.label,
+      t.title, this.fmtDeadline(t.deadline), t.price, STATUSES[t.status]?.label, t.paymentReceived ? 'Có' : 'Không', t.paymentReceivedDate ? this.fmtDate(t.paymentReceivedDate) : '',
       t.notes, this.fmtDate(t.createdAt)
     ].map(v => `"${(v||'').toString().replace(/"/g,'""')}"`));
     const csv = [h, ...rows].map(r => r.join(',')).join('\n');
@@ -1054,6 +1369,10 @@ const app = {
   },
 
   /* ─── UTILS ─── */
+  formatPrice(el) {
+    const raw = el.value.replace(/\D/g, '');
+    el.value = raw ? Number(raw).toLocaleString('vi-VN') : '';
+  },
   fmt(n) {
     if (!n) return '0đ';
     return new Intl.NumberFormat('vi-VN').format(n) + 'đ';
@@ -1077,8 +1396,11 @@ const app = {
 };
 
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escAttr(s) { return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
+function tgEsc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function fmtSize(b) { if (b<1024) return b+'B'; if (b<1048576) return (b/1024).toFixed(1)+'KB'; return (b/1048576).toFixed(1)+'MB'; }
 function dlBlob(blob, name) { const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:name}); a.click(); URL.revokeObjectURL(a.href); }
+function todayLocal() { return new Date().toLocaleDateString('en-CA'); }
 
 app.init();
 </script>

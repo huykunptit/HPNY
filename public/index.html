@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskFlow — Quản Lý Đơn Hàng</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0e0e10;--s1:#18181b;--s2:#1f1f23;--s3:#27272b;--s4:#313136;
+  --bd:#2a2a2f;--bd2:#38383f;
+  --t1:#e8e8ea;--t2:#8e8e9a;--t3:#52525c;
+  --acc:#f59e0b;--acc2:#d97706;
+  --blue:#60a5fa;--green:#4ade80;--orange:#fb923c;--red:#f87171;
+  --r:8px;--r2:12px;
+  --font:'Be Vietnam Pro',sans-serif;
+}
+html{font-size:14px}
+body{font-family:var(--font);background:var(--bg);color:var(--t1);min-height:100vh;line-height:1.5}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+
+.app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+
+/* HEADER */
+.hdr{display:flex;align-items:center;gap:12px;padding:0 20px;height:54px;border-bottom:1px solid var(--bd);background:var(--s1);flex-shrink:0}
+.logo{font-size:15px;font-weight:800;color:var(--t1);letter-spacing:-.03em;display:flex;align-items:center;gap:8px;cursor:default;user-select:none}
+.logo-ico{width:26px;height:26px;background:var(--acc);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#000;font-weight:800}
+.hdrsep{width:1px;height:18px;background:var(--bd2);flex-shrink:0}
+.hdr-r{display:flex;align-items:center;gap:6px;margin-left:auto}
+.vtog{display:flex;background:var(--s2);border-radius:6px;padding:2px;gap:2px}
+.vbtn{padding:5px 11px;border-radius:4px;border:none;background:transparent;color:var(--t2);font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:4px}
+.vbtn.active{background:var(--s3);color:var(--t1)}
+.vbtn:hover:not(.active){color:var(--t1)}
+.icobtn{width:30px;height:30px;border-radius:6px;border:none;background:transparent;color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:.15s}
+.icobtn:hover{background:var(--s3);color:var(--t1)}
+
+/* STATS BAR */
+.stats{display:flex;align-items:center;gap:4px;padding:10px 20px;border-bottom:1px solid var(--bd);background:var(--s1);flex-shrink:0;overflow-x:auto}
+.stitem{display:flex;align-items:center;gap:7px;white-space:nowrap;cursor:pointer;padding:5px 10px;border-radius:6px;transition:.15s;border:1px solid transparent}
+.stitem:hover{background:var(--s2)}
+.stitem.active{background:var(--s2);border-color:var(--bd2)}
+.stitem .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.stitem .lbl{font-size:12px;color:var(--t2);font-weight:500}
+.stitem .cnt{background:var(--s3);color:var(--t1);padding:1px 7px;border-radius:10px;font-size:11px;font-weight:700}
+.stitem .val{font-size:11px;color:var(--acc);font-weight:600;margin-left:2px}
+
+/* MAIN */
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.tlbar{display:flex;align-items:center;gap:8px;padding:12px 20px;flex-shrink:0}
+.sbox{display:flex;align-items:center;gap:7px;background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:0 11px;height:32px;flex:1;max-width:280px}
+.sbox input{background:none;border:none;outline:none;color:var(--t1);font-family:var(--font);font-size:13px;width:100%}
+.sbox input::placeholder{color:var(--t3)}
+.spacer{flex:1}
+.btn{height:32px;padding:0 13px;border-radius:6px;border:none;font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:5px;transition:.15s;white-space:nowrap}
+.btn-p{background:var(--acc);color:#000}
+.btn-p:hover{background:var(--acc2)}
+.btn-g{background:var(--s2);color:var(--t2);border:1px solid var(--bd)}
+.btn-g:hover{background:var(--s3);color:var(--t1)}
+.btn-d{background:rgba(248,113,113,.12);color:var(--red);border:1px solid rgba(248,113,113,.2)}
+.btn-d:hover{background:rgba(248,113,113,.22)}
+.btn-sm{height:26px;padding:0 10px;font-size:12px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* LOADING */
+.loading-bar{position:fixed;top:0;left:0;right:0;height:2px;background:var(--acc);z-index:9999;transform:scaleX(0);transform-origin:left;transition:transform .3s;display:none}
+.loading-bar.active{display:block;animation:loadpulse 1s ease infinite}
+@keyframes loadpulse{0%{transform:scaleX(0)}50%{transform:scaleX(.7)}100%{transform:scaleX(1)}}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TABLE */
+.tview{flex:1;overflow:auto;padding:0 20px 20px}
+table{width:100%;border-collapse:collapse;min-width:860px}
+thead{position:sticky;top:0;z-index:10}
+th{background:var(--s1);padding:9px 12px;text-align:left;font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--bd);white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid var(--bd);font-size:13px;color:var(--t1);vertical-align:middle}
+tr.drow{cursor:pointer;transition:.1s}
+tr.drow:hover td{background:rgba(255,255,255,.025)}
+tr:last-child td{border-bottom:none}
+.cust-cell strong{font-size:13px;font-weight:600;display:block}
+.cust-cell span{font-size:11px;color:var(--t2)}
+.price-c{font-weight:700;color:var(--acc);font-family:monospace;font-size:13px}
+.title-c{font-weight:500;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acts{display:flex;gap:4px;opacity:0;transition:.15s}
+tr.drow:hover .acts{opacity:1}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.b-todo{background:rgba(142,142,154,.12);color:#8e8e9a}
+.b-doing{background:rgba(96,165,250,.12);color:#60a5fa}
+.b-review{background:rgba(251,146,60,.12);color:#fb923c}
+.b-paid{background:rgba(74,222,128,.12);color:#4ade80}
+
+/* EMPTY */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:260px;color:var(--t3);gap:10px}
+.empty-ico{font-size:44px}
+.empty p{font-size:14px}
+
+/* ═══════════════════════════════════════
+   KANBAN – Drag & Drop
+═══════════════════════════════════════ */
+.kview{flex:1;overflow-x:auto;padding:14px 20px 20px;display:flex;gap:12px;align-items:flex-start}
+.kcol{flex-shrink:0;width:276px;background:var(--s1);border-radius:var(--r2);border:1px solid var(--bd);display:flex;flex-direction:column;max-height:calc(100vh - 200px);transition:border-color .2s,background .2s}
+.kcol.drag-over{border-color:var(--acc);background:rgba(245,158,11,.05)}
+.kcol-hd{padding:12px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px;flex-shrink:0;user-select:none}
+.kcol-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.kcol-title{font-size:13px;font-weight:600}
+.kcol-cnt{background:var(--s3);color:var(--t2);padding:1px 8px;border-radius:10px;font-size:11px;font-weight:700;margin-left:auto}
+.kcards{padding:8px;overflow-y:auto;display:flex;flex-direction:column;gap:7px;flex:1;min-height:60px}
+
+/* Card */
+.kcard{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:12px;cursor:grab;transition:border-color .15s,background .15s,box-shadow .15s,opacity .15s,transform .15s;user-select:none;position:relative}
+.kcard:active{cursor:grabbing}
+.kcard:hover{background:var(--s3);border-color:var(--bd2);box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.kcard.dragging{opacity:.35;transform:scale(.97);cursor:grabbing}
+.kcard.drag-placeholder{background:rgba(245,158,11,.07);border:1px dashed var(--acc);opacity:.7}
+
+.kcard-title{font-size:13px;font-weight:600;margin-bottom:5px;color:var(--t1);line-height:1.4}
+.kcard-cust{font-size:11px;color:var(--t2);margin-bottom:9px;display:flex;align-items:center;gap:4px}
+.kcard-ft{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.kcard-price{font-size:12px;font-weight:700;color:var(--acc);font-family:monospace}
+.kcard-dur{font-size:11px;color:var(--t3)}
+.kcard-empty{text-align:center;color:var(--t3);font-size:12px;padding:20px 8px;border:1px dashed var(--bd);border-radius:6px;margin:2px}
+.kcard-actions{display:flex;gap:4px;position:absolute;top:8px;right:8px;opacity:0;transition:.15s}
+.kcard:hover .kcard-actions{opacity:1}
+.kcard-btn{width:22px;height:22px;border-radius:4px;border:none;background:var(--s4);color:var(--t2);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:.15s}
+.kcard-btn:hover{background:var(--bd2);color:var(--t1)}
+
+/* Drop indicator line */
+.drop-line{height:3px;background:var(--acc);border-radius:2px;margin:2px 0;transition:opacity .15s;opacity:0;pointer-events:none}
+.kcol.drag-over .drop-line{opacity:1}
+
+/* MODAL */
+.moverlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;opacity:0;visibility:hidden;transition:.2s}
+.moverlay.open{opacity:1;visibility:visible}
+.modal{background:var(--s1);border:1px solid var(--bd2);border-radius:var(--r2);width:100%;max-width:680px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.7);transform:translateY(16px) scale(.985);transition:.2s}
+.moverlay.open .modal{transform:none}
+.mhd{padding:18px 22px 15px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.mhd-title{font-size:15px;font-weight:700;flex:1}
+.mbody{padding:18px 22px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:14px}
+.mfooter{padding:14px 22px;border-top:1px solid var(--bd);display:flex;align-items:center;gap:8px;justify-content:flex-end;flex-shrink:0}
+
+/* FORM */
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg.full{grid-column:span 2}
+.flbl{font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.06em}
+.fi,.fta,.fsel{background:var(--s2);border:1px solid var(--bd);border-radius:6px;color:var(--t1);font-family:var(--font);font-size:13px;padding:7px 11px;outline:none;width:100%;transition:.15s}
+.fi:focus,.fta:focus,.fsel:focus{border-color:var(--acc);background:var(--s3)}
+.fta{resize:vertical;min-height:76px;line-height:1.5}
+.fsel{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 11 11'%3E%3Cpath fill='%23666' d='M5.5 7L1 2.5h9z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.fsel option{background:var(--s2)}
+.fgrp-title{font-size:11px;font-weight:700;color:var(--acc);text-transform:uppercase;letter-spacing:.06em;padding-bottom:4px;border-bottom:1px solid var(--bd);grid-column:span 2;margin-top:4px}
+
+/* FILE UPLOAD */
+.fupload{border:1px dashed var(--bd2);border-radius:6px;padding:14px;text-align:center;cursor:pointer;transition:.15s;position:relative}
+.fupload:hover{border-color:var(--acc);background:rgba(245,158,11,.04)}
+.fupload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.fupload-txt{font-size:12px;color:var(--t2)}
+.fupload-txt strong{display:block;font-size:13px;color:var(--t1);margin-bottom:2px}
+.flist{display:flex;flex-direction:column;gap:4px;margin-top:8px}
+.fitem{display:flex;align-items:center;gap:7px;background:var(--s2);border-radius:4px;padding:5px 9px;font-size:12px}
+.fname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--t1)}
+.fsize{color:var(--t3);flex-shrink:0}
+.frm{color:var(--t3);cursor:pointer;background:none;border:none;padding:0;font-size:13px;transition:.15s;flex-shrink:0}
+.frm:hover{color:var(--red)}
+
+/* SUB TABS */
+.stabs{display:flex;gap:2px;background:var(--s2);border-radius:6px;padding:2px;margin-bottom:8px;width:fit-content}
+.stab{padding:4px 13px;border-radius:4px;border:none;background:transparent;color:var(--t2);font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;transition:.15s}
+.stab.active{background:var(--s3);color:var(--t1)}
+
+/* DETAIL MODAL */
+.doverlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;opacity:0;visibility:hidden;transition:.2s}
+.doverlay.open{opacity:1;visibility:visible}
+.dmodal{background:var(--s1);border:1px solid var(--bd2);border-radius:var(--r2);width:100%;max-width:760px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.7);transform:translateY(16px);transition:.2s}
+.doverlay.open .dmodal{transform:none}
+.dhd{padding:20px 24px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:flex-start;gap:12px;flex-shrink:0}
+.dhd-info{flex:1}
+.dtitle{font-size:19px;font-weight:800;margin-bottom:6px;letter-spacing:-.02em}
+.dmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dbody{padding:20px 24px;overflow-y:auto;flex:1}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.dsec{display:flex;flex-direction:column;gap:5px}
+.dsec.full{grid-column:span 2}
+.dsec-lbl{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em}
+.dsec-val{font-size:13px;color:var(--t1);line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.dfooter{padding:14px 24px;border-top:1px solid var(--bd);display:flex;gap:8px;flex-shrink:0;align-items:center}
+
+/* STATUS SELECT */
+.sopt-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:12px;border-top:1px solid var(--bd);padding-top:12px}
+.sopt{padding:4px 11px;border-radius:20px;border:1px solid transparent;font-size:11px;font-weight:700;cursor:pointer;transition:.15s;background:var(--s2);color:var(--t2);font-family:var(--font)}
+.sopt:hover{background:var(--s3)}
+.sopt.todo.on{background:rgba(142,142,154,.16);color:#8e8e9a;border-color:rgba(142,142,154,.25)}
+.sopt.doing.on{background:rgba(96,165,250,.16);color:#60a5fa;border-color:rgba(96,165,250,.25)}
+.sopt.review.on{background:rgba(251,146,60,.16);color:#fb923c;border-color:rgba(251,146,60,.25)}
+.sopt.paid.on{background:rgba(74,222,128,.16);color:#4ade80;border-color:rgba(74,222,128,.25)}
+
+/* SETTINGS PANEL */
+.sp{position:fixed;right:0;top:0;bottom:0;width:310px;background:var(--s1);border-left:1px solid var(--bd2);z-index:999;display:flex;flex-direction:column;transform:translateX(100%);transition:.25s;box-shadow:-8px 0 40px rgba(0,0,0,.5)}
+.sp.open{transform:none}
+.sphd{padding:18px 20px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.spbody{padding:18px 20px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:14px}
+.sp-sec-title{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.tgl-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0}
+.tgl-lbl{font-size:13px;color:var(--t1)}
+.tgl{width:34px;height:19px;border-radius:10px;background:var(--s3);border:none;cursor:pointer;position:relative;transition:.2s;flex-shrink:0}
+.tgl.on{background:var(--acc)}
+.tgl::after{content:'';position:absolute;width:13px;height:13px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s}
+.tgl.on::after{left:18px}
+.sp-hint{font-size:11px;color:var(--t3);line-height:1.6;background:var(--s2);border-radius:6px;padding:10px 12px;border:1px solid var(--bd)}
+.sp-hint a{color:var(--acc)}
+.sp-actions{display:flex;flex-direction:column;gap:8px}
+
+/* TOAST */
+.toastc{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:7px;z-index:9999;pointer-events:none}
+.toast{background:var(--s2);border:1px solid var(--bd2);border-radius:var(--r);padding:11px 14px;font-size:13px;box-shadow:0 8px 32px rgba(0,0,0,.5);display:flex;align-items:center;gap:9px;min-width:250px;max-width:340px;animation:tin .22s ease;pointer-events:all}
+.toast.ok{border-left:3px solid var(--green)}
+.toast.err{border-left:3px solid var(--red)}
+.toast.inf{border-left:3px solid var(--blue)}
+.toast.warn{border-left:3px solid var(--orange)}
+@keyframes tin{from{transform:translateX(30px);opacity:0}to{transform:none;opacity:1}}
+@keyframes tout{to{transform:translateX(30px);opacity:0}}
+</style>
+</head>
+<body>
+<div class="loading-bar" id="loading-bar"></div>
+<div class="app" id="app">
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="logo"><div class="logo-ico">✦</div> TaskFlow</div>
+  <div class="hdrsep"></div>
+  <span style="font-size:12px;color:var(--t2)" id="hdr-count">—</span>
+  <div class="hdr-r">
+    <div class="vtog">
+      <button class="vbtn active" id="btn-table" onclick="app.setView('table')">⊞ Bảng</button>
+      <button class="vbtn" id="btn-kanban" onclick="app.setView('kanban')">⬛ Kanban</button>
+    </div>
+    <button class="icobtn" onclick="app.toggleSettings()" title="Cài đặt & Telegram">⚙</button>
+  </div>
+</header>
+
+<!-- STATS BAR -->
+<div class="stats" id="stats-bar"></div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="tlbar">
+    <div class="sbox">
+      <span style="color:var(--t3);font-size:13px">🔍</span>
+      <input type="text" placeholder="Tìm khách hàng, đề bài..." id="search-input" oninput="app.onSearch(this.value)">
+    </div>
+    <div class="spacer"></div>
+    <button class="btn btn-p" onclick="app.openAdd()">＋ Thêm đơn hàng</button>
+  </div>
+
+  <!-- TABLE VIEW -->
+  <div class="tview" id="table-view">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:28px">#</th>
+          <th>Khách hàng</th>
+          <th>Đề bài</th>
+          <th>Thời lượng</th>
+          <th>Giá</th>
+          <th>Trạng thái</th>
+          <th>Ngày tạo</th>
+          <th>Ghi chú</th>
+          <th style="width:80px"></th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+    <div class="empty" id="table-empty" style="display:none">
+      <div class="empty-ico">📋</div>
+      <p>Chưa có đơn hàng nào</p>
+      <button class="btn btn-p" onclick="app.openAdd()">＋ Tạo đơn đầu tiên</button>
+    </div>
+  </div>
+
+  <!-- KANBAN VIEW -->
+  <div class="kview" id="kanban-view" style="display:none"></div>
+</div>
+</div>
+
+<!-- TOAST -->
+<div class="toastc" id="toast-c"></div>
+
+<!-- SETTINGS PANEL -->
+<div class="sp" id="settings-panel">
+  <div class="sphd">
+    <span style="font-size:15px;font-weight:700">Cài đặt</span>
+    <div style="flex:1"></div>
+    <button class="icobtn" onclick="app.toggleSettings()">✕</button>
+  </div>
+  <div class="spbody">
+    <div>
+      <div class="sp-sec-title">🔔 Telegram Bot</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="fg">
+          <label class="flbl">Bot Token</label>
+          <input class="fi" type="text" id="tg-token" placeholder="123456:ABCdef..." oninput="app.saveTgSettings()">
+        </div>
+        <div class="fg">
+          <label class="flbl">Chat ID</label>
+          <input class="fi" type="text" id="tg-chatid" placeholder="-100xxxxxxxxx" oninput="app.saveTgSettings()">
+        </div>
+        <button class="btn btn-g" onclick="app.testTelegram()">🧪 Test kết nối</button>
+      </div>
+    </div>
+    <div>
+      <div class="sp-sec-title">Thông báo khi</div>
+      <div class="tgl-row"><span class="tgl-lbl">Đơn mới được tạo</span><button class="tgl on" id="tg-new" onclick="app.toggleTgNoti('new',this)"></button></div>
+      <div class="tgl-row"><span class="tgl-lbl">Đổi trạng thái</span><button class="tgl on" id="tg-status" onclick="app.toggleTgNoti('status',this)"></button></div>
+      <div class="tgl-row"><span class="tgl-lbl">Đã thanh toán 🎉</span><button class="tgl on" id="tg-paid" onclick="app.toggleTgNoti('paid',this)"></button></div>
+    </div>
+    <div class="sp-hint">
+      <b style="color:var(--t1)">Cách lấy Bot Token:</b><br>
+      1. Nhắn <code style="color:var(--acc)">/newbot</code> cho <a href="https://t.me/BotFather" target="_blank">@BotFather</a><br>
+      2. Copy token được cấp<br>
+      3. Lấy Chat ID qua <a href="https://t.me/userinfobot" target="_blank">@userinfobot</a>
+    </div>
+    <div>
+      <div class="sp-sec-title">Dữ liệu</div>
+      <div class="sp-actions">
+        <button class="btn btn-g" onclick="app.exportCSV()">📊 Xuất CSV</button>
+        <button class="btn btn-d btn-sm" onclick="app.clearAll()">🗑 Xoá tất cả</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="moverlay" id="edit-overlay" onclick="app.closeEdit(event)">
+  <div class="modal">
+    <div class="mhd">
+      <span class="mhd-title" id="modal-title">Thêm đơn hàng mới</span>
+      <button class="icobtn" onclick="app.closeEditDirect()">✕</button>
+    </div>
+    <div class="mbody">
+      <div class="frow">
+        <div class="fgrp-title">👤 Thông tin khách hàng</div>
+        <div class="fg"><label class="flbl">Tên khách hàng *</label><input class="fi" id="f-name" placeholder="Nguyễn Văn A"></div>
+        <div class="fg"><label class="flbl">Số điện thoại</label><input class="fi" id="f-phone" placeholder="0912 345 678"></div>
+        <div class="fg"><label class="flbl">Email</label><input class="fi" id="f-email" type="email" placeholder="example@gmail.com"></div>
+        <div class="fg"><label class="flbl">Mạng XH / Link</label><input class="fi" id="f-social" placeholder="Facebook, Zalo..."></div>
+      </div>
+      <div class="frow">
+        <div class="fgrp-title">📝 Thông tin đơn hàng</div>
+        <div class="fg full"><label class="flbl">Đề bài *</label><input class="fi" id="f-title" placeholder="Tên đề bài / dự án"></div>
+        <div class="fg full"><label class="flbl">Mô tả chi tiết</label><textarea class="fta" id="f-desc" placeholder="Mô tả yêu cầu..."></textarea></div>
+        <div class="fg"><label class="flbl">Thời lượng</label><input class="fi" id="f-dur" placeholder="3 ngày, 1 tuần..."></div>
+        <div class="fg"><label class="flbl">Giá (VNĐ)</label><input class="fi" id="f-price" type="number" placeholder="500000"></div>
+        <div class="fg full"><label class="flbl">Ghi chú nội bộ</label><textarea class="fta" id="f-notes" placeholder="Ghi chú..."></textarea></div>
+        <div class="fg">
+          <label class="flbl">Trạng thái</label>
+          <select class="fsel" id="f-status">
+            <option value="todo">⬜ Chưa làm</option>
+            <option value="doing">🔵 Đang làm</option>
+            <option value="review">🟡 Đang review</option>
+            <option value="paid">🟢 Đã thanh toán</option>
+          </select>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fgrp-title">📎 File đi kèm (từ khách)</div>
+        <div class="fg full">
+          <div class="fupload">
+            <input type="file" multiple id="f-attach" onchange="app.handleFiles('attach',this.files)">
+            <div class="fupload-txt"><strong>Kéo thả hoặc click để tải file</strong>Tối đa 2MB / file</div>
+          </div>
+          <div class="flist" id="attach-list"></div>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fgrp-title">📤 Bài gửi đi</div>
+        <div class="fg full">
+          <div class="stabs">
+            <button class="stab active" id="sub-tab-text" onclick="app.switchSubTab('text')">Văn bản / Link</button>
+            <button class="stab" id="sub-tab-file" onclick="app.switchSubTab('file')">File đính kèm</button>
+          </div>
+          <div id="sub-text-area"><textarea class="fta" id="f-sub-text" placeholder="Link Google Drive, nội dung đã gửi..."></textarea></div>
+          <div id="sub-file-area" style="display:none">
+            <div class="fupload">
+              <input type="file" multiple id="f-sub-files" onchange="app.handleFiles('sub',this.files)">
+              <div class="fupload-txt"><strong>File bài gửi cho khách</strong>Tối đa 2MB / file</div>
+            </div>
+            <div class="flist" id="sub-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mfooter">
+      <button class="btn btn-d btn-sm" id="delete-btn" onclick="app.deleteTask()" style="display:none">🗑 Xoá</button>
+      <div style="flex:1"></div>
+      <button class="btn btn-g" onclick="app.closeEditDirect()">Huỷ</button>
+      <button class="btn btn-p" id="save-btn" onclick="app.saveTask()">💾 Lưu lại</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="doverlay" id="detail-overlay" onclick="app.closeDetail(event)">
+  <div class="dmodal">
+    <div class="dhd">
+      <div class="dhd-info">
+        <div class="dtitle" id="d-title"></div>
+        <div class="dmeta" id="d-meta"></div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button class="btn btn-g btn-sm" onclick="app.editFromDetail()">✏ Sửa</button>
+        <button class="icobtn" onclick="app.closeDetailDirect()">✕</button>
+      </div>
+    </div>
+    <div class="dbody">
+      <div class="dgrid" id="d-content"></div>
+      <div class="sopt-row" id="d-status-opts"></div>
+    </div>
+    <div class="dfooter">
+      <span style="font-size:11px;color:var(--t3)" id="d-dates"></span>
+      <div style="flex:1"></div>
+      <button class="btn btn-d btn-sm" onclick="app.deleteFromDetail()">🗑 Xoá đơn</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════ */
+const STATUSES = {
+  todo:   { label:'Chưa làm',    dot:'#52525c', cls:'b-todo',   emoji:'⬜' },
+  doing:  { label:'Đang làm',    dot:'#60a5fa', cls:'b-doing',  emoji:'🔵' },
+  review: { label:'Đang review', dot:'#fb923c', cls:'b-review', emoji:'🟡' },
+  paid:   { label:'Đã thanh toán',dot:'#4ade80',cls:'b-paid',   emoji:'🟢' },
+};
+
+/* ═══════════════════════════════════════
+   API LAYER
+═══════════════════════════════════════ */
+const API = {
+  async get()           { return fetch('/api/tasks').then(r=>r.json()) },
+  async create(data)    { return fetch('/api/tasks',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()) },
+  async update(id,data) { return fetch(`/api/tasks/${id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()) },
+  async status(id,s)    { return fetch(`/api/tasks/${id}/status`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:s})).then(r=>r.json()) },
+  async remove(id)      { return fetch(`/api/tasks/${id}`,{method:'DELETE'}).then(r=>r.json()) },
+};
+
+/* ═══════════════════════════════════════
+   APP
+═══════════════════════════════════════ */
+const app = {
+  tasks: [],
+  settings: { token:'', chatid:'', notiNew:true, notiStatus:true, notiPaid:true },
+  view: 'table',
+  filter: 'all',
+  search: '',
+  editingId: null,
+  viewingId: null,
+  attachFiles: [],
+  subFiles: [],
+  subTab: 'text',
+  // Drag state
+  dragId: null,
+
+  async init() {
+    try {
+      const s = JSON.parse(localStorage.getItem('tf_settings') || '{}');
+      this.settings = { ...this.settings, ...s };
+    } catch(e) {}
+    this.loadSettings();
+    this.setLoading(true);
+    try {
+      this.tasks = await API.get();
+    } catch(e) {
+      this.toast('err', '❌ Không kết nối được server');
+    }
+    this.setLoading(false);
+    this.render();
+  },
+
+  setLoading(v) {
+    document.getElementById('loading-bar').style.display = v ? 'block' : 'none';
+  },
+
+  getFiltered() {
+    return this.tasks.filter(t => {
+      if (this.filter !== 'all' && t.status !== this.filter) return false;
+      if (this.search) {
+        const q = this.search.toLowerCase();
+        if (!(t.customerName||'').toLowerCase().includes(q) &&
+            !(t.title||'').toLowerCase().includes(q) &&
+            !(t.notes||'').toLowerCase().includes(q)) return false;
+      }
+      return true;
+    });
+  },
+
+  render() {
+    const filtered = this.getFiltered();
+    document.getElementById('hdr-count').textContent = this.tasks.length + ' đơn hàng';
+    this.renderStats();
+    if (this.view === 'table') this.renderTable(filtered);
+    else this.renderKanban();
+  },
+
+  renderStats() {
+    const counts = { all: this.tasks.length, todo:0, doing:0, review:0, paid:0 };
+    let totalPaid = 0;
+    this.tasks.forEach(t => {
+      counts[t.status] = (counts[t.status]||0) + 1;
+      if (t.status === 'paid') totalPaid += parseFloat(t.price||0);
+    });
+    const items = [
+      { key:'all', label:'Tất cả', dot:'#52525c' },
+      { key:'todo', label:'Chưa làm', dot:STATUSES.todo.dot },
+      { key:'doing', label:'Đang làm', dot:STATUSES.doing.dot },
+      { key:'review', label:'Đang review', dot:STATUSES.review.dot },
+      { key:'paid', label:'Đã thanh toán', dot:STATUSES.paid.dot, val:totalPaid },
+    ];
+    document.getElementById('stats-bar').innerHTML = items.map(i => `
+      <div class="stitem${this.filter===i.key?' active':''}" onclick="app.setFilter('${i.key}')">
+        <span class="dot" style="background:${i.dot}"></span>
+        <span class="lbl">${i.label}</span>
+        <span class="cnt">${counts[i.key]||0}</span>
+        ${i.val ? `<span class="val">${this.fmt(i.val)}</span>` : ''}
+      </div>
+    `).join('');
+  },
+
+  renderTable(filtered) {
+    const tbody = document.getElementById('table-body');
+    const empty = document.getElementById('table-empty');
+    if (!filtered.length) { tbody.innerHTML=''; empty.style.display='flex'; return; }
+    empty.style.display = 'none';
+    tbody.innerHTML = filtered.map((t,i) => `
+      <tr class="drow" onclick="app.openDetail('${t.id}')">
+        <td style="color:var(--t3);font-size:11px">${i+1}</td>
+        <td class="cust-cell"><strong>${esc(t.customerName||'—')}</strong><span>${esc(t.customerPhone||t.customerEmail||'')}</span></td>
+        <td class="title-c">${esc(t.title||'—')}</td>
+        <td style="color:var(--t2);font-size:12px">${esc(t.duration||'—')}</td>
+        <td class="price-c">${t.price ? this.fmt(t.price) : '—'}</td>
+        <td><span class="badge ${STATUSES[t.status]?.cls||'b-todo'}">${STATUSES[t.status]?.label||t.status}</span></td>
+        <td style="color:var(--t2);font-size:11px">${this.fmtDate(t.createdAt)}</td>
+        <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--t2);font-size:12px">${esc(t.notes||'—')}</td>
+        <td onclick="event.stopPropagation()">
+          <div class="acts">
+            <button class="btn btn-g btn-sm" onclick="app.openEdit('${t.id}')">✏</button>
+            <button class="btn btn-d btn-sm" onclick="app.confirmDelete('${t.id}')">✕</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  },
+
+  /* ─── KANBAN ─── */
+  renderKanban() {
+    const kv = document.getElementById('kanban-view');
+    kv.innerHTML = Object.entries(STATUSES).map(([status, st]) => {
+      const items = this.tasks.filter(t =>
+        t.status === status &&
+        (this.search === '' ||
+         (t.customerName||'').toLowerCase().includes(this.search.toLowerCase()) ||
+         (t.title||'').toLowerCase().includes(this.search.toLowerCase()))
+      );
+      return `
+        <div class="kcol" id="col-${status}" data-status="${status}"
+          ondragover="app.onDragOver(event,'${status}')"
+          ondragleave="app.onDragLeave(event,'${status}')"
+          ondrop="app.onDrop(event,'${status}')">
+          <div class="kcol-hd">
+            <span class="kcol-dot" style="background:${st.dot}"></span>
+            <span class="kcol-title">${st.label}</span>
+            <span class="kcol-cnt">${items.length}</span>
+          </div>
+          <div class="kcards" id="cards-${status}">
+            ${items.length
+              ? items.map(t => this.buildCard(t)).join('')
+              : `<div class="kcard-empty">Kéo thả đơn vào đây</div>`
+            }
+          </div>
+        </div>`;
+    }).join('');
+  },
+
+  buildCard(t) {
+    return `
+      <div class="kcard" id="card-${t.id}" data-id="${t.id}"
+        draggable="true"
+        ondragstart="app.onDragStart(event,'${t.id}')"
+        ondragend="app.onDragEnd(event,'${t.id}')"
+        onclick="app.openDetail('${t.id}')">
+        <div class="kcard-actions">
+          <button class="kcard-btn" onclick="event.stopPropagation();app.openEdit('${t.id}')" title="Sửa">✏</button>
+          <button class="kcard-btn" onclick="event.stopPropagation();app.confirmDelete('${t.id}')" title="Xoá" style="color:var(--red)">✕</button>
+        </div>
+        <div class="kcard-title">${esc(t.title||'Chưa có tiêu đề')}</div>
+        <div class="kcard-cust">👤 ${esc(t.customerName||'—')}</div>
+        <div class="kcard-ft">
+          <span class="kcard-price">${t.price ? this.fmt(t.price) : '—'}</span>
+          <span class="kcard-dur">${esc(t.duration||'')}</span>
+        </div>
+      </div>`;
+  },
+
+  /* ─── DRAG & DROP ─── */
+  onDragStart(e, id) {
+    this.dragId = id;
+    e.dataTransfer.setData('text/plain', id);
+    e.dataTransfer.effectAllowed = 'move';
+    // Use timeout so card renders before opacity change
+    setTimeout(() => {
+      const el = document.getElementById('card-' + id);
+      if (el) el.classList.add('dragging');
+    }, 0);
+  },
+
+  onDragEnd(e, id) {
+    const el = document.getElementById('card-' + id);
+    if (el) el.classList.remove('dragging');
+    // Remove all drag-over highlights
+    document.querySelectorAll('.kcol').forEach(c => c.classList.remove('drag-over'));
+    this.dragId = null;
+  },
+
+  onDragOver(e, status) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    document.getElementById('col-' + status)?.classList.add('drag-over');
+  },
+
+  onDragLeave(e, status) {
+    const col = document.getElementById('col-' + status);
+    // Only remove if we're leaving the column entirely
+    if (col && !col.contains(e.relatedTarget)) {
+      col.classList.remove('drag-over');
+    }
+  },
+
+  async onDrop(e, newStatus) {
+    e.preventDefault();
+    const col = document.getElementById('col-' + newStatus);
+    col?.classList.remove('drag-over');
+
+    const taskId = e.dataTransfer.getData('text/plain') || this.dragId;
+    if (!taskId) return;
+
+    const task = this.tasks.find(t => t.id === taskId);
+    if (!task || task.status === newStatus) return;
+
+    const oldStatus = task.status;
+    // Optimistic update
+    task.status = newStatus;
+    task.updatedAt = new Date().toISOString();
+    this.render();
+
+    try {
+      const result = await API.status(taskId, newStatus);
+      // Sync from server
+      const idx = this.tasks.findIndex(t => t.id === taskId);
+      if (idx !== -1) this.tasks[idx] = result.task;
+
+      this.toast('ok', `✅ ${esc(task.title||'Đơn')}: ${STATUSES[oldStatus].label} → ${STATUSES[newStatus].label}`);
+
+      if (this.settings.notiStatus) {
+        this.sendTelegram(`🔄 <b>Cập nhật trạng thái</b>\n👤 ${task.customerName}\n📌 ${task.title}\n${STATUSES[oldStatus].label} → ${STATUSES[newStatus].label}`);
+      }
+      if (this.settings.notiPaid && newStatus === 'paid' && oldStatus !== 'paid') {
+        this.sendTelegram(`🎉 <b>Đã thanh toán!</b>\n👤 ${task.customerName}\n📌 ${task.title}\n💰 ${this.fmt(task.price)}`);
+      }
+    } catch(err) {
+      // Rollback
+      task.status = oldStatus;
+      this.render();
+      this.toast('err', '❌ Cập nhật thất bại, thử lại');
+    }
+  },
+
+  /* ─── VIEWS ─── */
+  setView(v) {
+    this.view = v;
+    document.getElementById('table-view').style.display = v === 'table' ? 'block' : 'none';
+    document.getElementById('kanban-view').style.display = v === 'kanban' ? 'flex' : 'none';
+    document.getElementById('btn-table').className = 'vbtn' + (v === 'table' ? ' active' : '');
+    document.getElementById('btn-kanban').className = 'vbtn' + (v === 'kanban' ? ' active' : '');
+    this.render();
+  },
+
+  setFilter(f) { this.filter = f; this.render(); },
+  onSearch(v)  { this.search = v; this.render(); },
+
+  /* ─── ADD / EDIT ─── */
+  openAdd() {
+    this.editingId = null;
+    this.attachFiles = [];
+    this.subFiles = [];
+    this.subTab = 'text';
+    document.getElementById('modal-title').textContent = 'Thêm đơn hàng mới';
+    document.getElementById('delete-btn').style.display = 'none';
+    this.clearForm();
+    this.switchSubTab('text');
+    document.getElementById('edit-overlay').classList.add('open');
+  },
+
+  openEdit(id) {
+    const t = this.tasks.find(x => x.id === id);
+    if (!t) return;
+    this.editingId = id;
+    this.attachFiles = JSON.parse(JSON.stringify(t.attachments||[]));
+    this.subFiles = JSON.parse(JSON.stringify(t.submissionFiles||[]));
+    this.subTab = t.submissionType || 'text';
+    document.getElementById('modal-title').textContent = 'Chỉnh sửa đơn hàng';
+    document.getElementById('delete-btn').style.display = 'flex';
+    ['name','phone','email','social','title','desc','dur','notes','sub-text'].forEach(k => {
+      const map = {name:'customerName',phone:'customerPhone',email:'customerEmail',social:'customerSocial',title:'title',desc:'description',dur:'duration',notes:'notes','sub-text':'submissionText'};
+      const el = document.getElementById('f-'+k);
+      if (el) el.value = t[map[k]] || '';
+    });
+    document.getElementById('f-price').value = t.price || '';
+    document.getElementById('f-status').value = t.status || 'todo';
+    this.switchSubTab(this.subTab);
+    this.renderFileList('attach', this.attachFiles);
+    this.renderFileList('sub', this.subFiles);
+    document.getElementById('edit-overlay').classList.add('open');
+  },
+
+  clearForm() {
+    ['f-name','f-phone','f-email','f-social','f-title','f-desc','f-dur','f-price','f-notes','f-sub-text'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.getElementById('f-status').value = 'todo';
+    this.renderFileList('attach', []);
+    this.renderFileList('sub', []);
+  },
+
+  async saveTask() {
+    const name = document.getElementById('f-name').value.trim();
+    const title = document.getElementById('f-title').value.trim();
+    if (!name)  { this.toast('err', '❌ Vui lòng nhập tên khách hàng'); return; }
+    if (!title) { this.toast('err', '❌ Vui lòng nhập đề bài'); return; }
+
+    const btn = document.getElementById('save-btn');
+    btn.innerHTML = '<span class="spin"></span> Đang lưu...';
+    btn.disabled = true;
+
+    const payload = {
+      customerName:   name,
+      customerPhone:  document.getElementById('f-phone').value.trim(),
+      customerEmail:  document.getElementById('f-email').value.trim(),
+      customerSocial: document.getElementById('f-social').value.trim(),
+      title,
+      description:    document.getElementById('f-desc').value.trim(),
+      duration:       document.getElementById('f-dur').value.trim(),
+      price:          parseFloat(document.getElementById('f-price').value) || 0,
+      notes:          document.getElementById('f-notes').value.trim(),
+      status:         document.getElementById('f-status').value,
+      attachments:    this.attachFiles,
+      submissionType: this.subTab,
+      submissionText: document.getElementById('f-sub-text').value.trim(),
+      submissionFiles: this.subFiles,
+    };
+
+    try {
+      if (this.editingId) {
+        const oldStatus = this.tasks.find(t => t.id === this.editingId)?.status;
+        const updated = await API.update(this.editingId, payload);
+        const idx = this.tasks.findIndex(t => t.id === this.editingId);
+        if (idx !== -1) this.tasks[idx] = updated;
+        this.toast('ok', '✅ Đã lưu thay đổi');
+        if (this.settings.notiStatus && oldStatus && oldStatus !== updated.status) {
+          this.sendTelegram(`🔄 <b>Cập nhật trạng thái</b>\n👤 ${updated.customerName}\n📌 ${updated.title}\n${STATUSES[oldStatus].label} → ${STATUSES[updated.status].label}`);
+        }
+        if (this.settings.notiPaid && updated.status === 'paid' && oldStatus !== 'paid') {
+          this.sendTelegram(`🎉 <b>Đã thanh toán!</b>\n👤 ${updated.customerName}\n📌 ${updated.title}\n💰 ${this.fmt(updated.price)}`);
+        }
+      } else {
+        const created = await API.create(payload);
+        this.tasks.unshift(created);
+        this.toast('ok', '✅ Đã thêm đơn hàng mới');
+        if (this.settings.notiNew) {
+          this.sendTelegram(`📋 <b>Đơn hàng mới</b>\n👤 ${created.customerName}\n📌 ${created.title}\n⏱ ${created.duration||'—'} | 💰 ${this.fmt(created.price)}`);
+        }
+      }
+      this.render();
+      this.closeEditDirect();
+    } catch(e) {
+      this.toast('err', '❌ Lưu thất bại: ' + e.message);
+    } finally {
+      btn.innerHTML = '💾 Lưu lại';
+      btn.disabled = false;
+    }
+  },
+
+  async deleteTask() {
+    if (!this.editingId || !confirm('Xoá đơn hàng này?')) return;
+    await this._delete(this.editingId);
+    this.closeEditDirect();
+  },
+
+  async confirmDelete(id) {
+    if (!confirm('Xoá đơn hàng này?')) return;
+    await this._delete(id);
+  },
+
+  async _delete(id) {
+    try {
+      await API.remove(id);
+      this.tasks = this.tasks.filter(t => t.id !== id);
+      this.toast('warn', '🗑 Đã xoá đơn hàng');
+      this.render();
+    } catch(e) {
+      this.toast('err', '❌ Xoá thất bại');
+    }
+  },
+
+  closeEdit(e)  { if (e.target === e.currentTarget) this.closeEditDirect(); },
+  closeEditDirect() { document.getElementById('edit-overlay').classList.remove('open'); },
+
+  /* ─── DETAIL ─── */
+  openDetail(id) {
+    const t = this.tasks.find(x => x.id === id);
+    if (!t) return;
+    this.viewingId = id;
+    document.getElementById('d-title').textContent = t.title || 'Chưa có tiêu đề';
+    document.getElementById('d-meta').innerHTML = `
+      <span class="badge ${STATUSES[t.status]?.cls||'b-todo'}">${STATUSES[t.status]?.label||t.status}</span>
+      <span style="font-size:12px;color:var(--t2)">👤 ${esc(t.customerName)}</span>
+      ${t.price ? `<span style="font-size:13px;color:var(--acc);font-weight:700;font-family:monospace">💰 ${this.fmt(t.price)}</span>` : ''}
+    `;
+    document.getElementById('d-dates').textContent = `Tạo: ${this.fmtDate(t.createdAt)} · Cập nhật: ${this.fmtDate(t.updatedAt)}`;
+    const fields = [
+      { l:'Tên khách hàng', v:t.customerName||'—' },
+      { l:'Số điện thoại', v:t.customerPhone||'—' },
+      { l:'Email', v:t.customerEmail||'—' },
+      { l:'Mạng XH / Link', v:t.customerSocial||'—' },
+      { l:'Mô tả', v:t.description||'—', full:true },
+      { l:'Thời lượng', v:t.duration||'—' },
+      { l:'Giá', v:t.price ? this.fmt(t.price)+'đ' : '—' },
+      { l:'Ghi chú', v:t.notes||'—', full:true },
+      { l:'File đi kèm', v:t.attachments?.length ? t.attachments.map(f=>`📎 ${esc(f.name)}`).join('\n') : 'Không có', full:true },
+      { l:'Bài gửi đi', v:t.submissionType==='text' ? (t.submissionText||'—') : (t.submissionFiles?.map(f=>`📄 ${esc(f.name)}`).join('\n')||'—'), full:true },
+    ];
+    document.getElementById('d-content').innerHTML = fields.map(f => `
+      <div class="dsec${f.full?' full':''}">
+        <div class="dsec-lbl">${f.l}</div>
+        <div class="dsec-val">${esc(f.v)}</div>
+      </div>
+    `).join('');
+    document.getElementById('d-status-opts').innerHTML =
+      Object.entries(STATUSES).map(([k,s]) => `
+        <button class="sopt ${k}${t.status===k?' on':''}" onclick="app.changeStatus('${t.id}','${k}')">${s.emoji} ${s.label}</button>
+      `).join('');
+    document.getElementById('detail-overlay').classList.add('open');
+  },
+
+  async changeStatus(id, status) {
+    const t = this.tasks.find(x => x.id === id);
+    if (!t) return;
+    const old = t.status;
+    t.status = status;
+    t.updatedAt = new Date().toISOString();
+    try {
+      await API.status(id, status);
+      this.render();
+      this.openDetail(id);
+      this.toast('ok', `✅ Đổi sang: ${STATUSES[status].label}`);
+      if (this.settings.notiStatus && old !== status)
+        this.sendTelegram(`🔄 <b>Cập nhật trạng thái</b>\n👤 ${t.customerName}\n📌 ${t.title}\n${STATUSES[old].label} → ${STATUSES[status].label}`);
+      if (this.settings.notiPaid && status === 'paid' && old !== 'paid')
+        this.sendTelegram(`🎉 <b>Đã thanh toán!</b>\n👤 ${t.customerName}\n📌 ${t.title}\n💰 ${this.fmt(t.price)}`);
+    } catch(e) {
+      t.status = old;
+      this.toast('err', '❌ Cập nhật thất bại');
+    }
+  },
+
+  editFromDetail()   { const id = this.viewingId; this.closeDetailDirect(); this.openEdit(id); },
+  async deleteFromDetail() {
+    if (!confirm('Xoá đơn hàng này?')) return;
+    await this._delete(this.viewingId);
+    this.closeDetailDirect();
+  },
+  closeDetail(e)  { if (e.target === e.currentTarget) this.closeDetailDirect(); },
+  closeDetailDirect() { document.getElementById('detail-overlay').classList.remove('open'); },
+
+  /* ─── FILES ─── */
+  handleFiles(type, files) {
+    const list = type === 'attach' ? this.attachFiles : this.subFiles;
+    Array.from(files).forEach(f => {
+      if (f.size > 2*1024*1024) { this.toast('warn', `⚠ ${f.name} vượt 2MB`); return; }
+      const reader = new FileReader();
+      reader.onload = e => {
+        list.push({ name:f.name, size:f.size, type:f.type, base64:e.target.result });
+        this.renderFileList(type, list);
+      };
+      reader.readAsDataURL(f);
+    });
+  },
+
+  renderFileList(type, list) {
+    const el = document.getElementById(type + '-list');
+    if (!el) return;
+    el.innerHTML = list.map((f,i) => `
+      <div class="fitem">
+        <span>📄</span>
+        <span class="fname" title="${esc(f.name)}">${esc(f.name)}</span>
+        <span class="fsize">${fmtSize(f.size)}</span>
+        ${f.base64 ? `<a href="${f.base64}" download="${esc(f.name)}" onclick="event.stopPropagation()" style="color:var(--blue);font-size:11px;text-decoration:none">⬇</a>` : ''}
+        <button class="frm" onclick="app.removeFile('${type}',${i});event.stopPropagation()">✕</button>
+      </div>
+    `).join('');
+  },
+
+  removeFile(type, idx) {
+    if (type === 'attach') this.attachFiles.splice(idx,1);
+    else this.subFiles.splice(idx,1);
+    this.renderFileList(type, type==='attach' ? this.attachFiles : this.subFiles);
+  },
+
+  switchSubTab(tab) {
+    this.subTab = tab;
+    document.getElementById('sub-tab-text').className = 'stab' + (tab==='text' ? ' active' : '');
+    document.getElementById('sub-tab-file').className = 'stab' + (tab==='file' ? ' active' : '');
+    document.getElementById('sub-text-area').style.display = tab==='text' ? 'block' : 'none';
+    document.getElementById('sub-file-area').style.display = tab==='file' ? 'block' : 'none';
+  },
+
+  /* ─── SETTINGS ─── */
+  toggleSettings() { document.getElementById('settings-panel').classList.toggle('open'); },
+
+  loadSettings() {
+    document.getElementById('tg-token').value = this.settings.token||'';
+    document.getElementById('tg-chatid').value = this.settings.chatid||'';
+    ['new','status','paid'].forEach(k => {
+      const el = document.getElementById('tg-'+k);
+      if (el) el.className = 'tgl' + (this.settings['noti'+k[0].toUpperCase()+k.slice(1)] ? ' on' : '');
+    });
+  },
+
+  saveTgSettings() {
+    this.settings.token  = document.getElementById('tg-token').value.trim();
+    this.settings.chatid = document.getElementById('tg-chatid').value.trim();
+    localStorage.setItem('tf_settings', JSON.stringify(this.settings));
+  },
+
+  toggleTgNoti(key, btn) {
+    const k = 'noti' + key[0].toUpperCase() + key.slice(1);
+    this.settings[k] = !this.settings[k];
+    btn.className = 'tgl' + (this.settings[k] ? ' on' : '');
+    localStorage.setItem('tf_settings', JSON.stringify(this.settings));
+  },
+
+  async sendTelegram(msg) {
+    const { token, chatid } = this.settings;
+    if (!token || !chatid) return;
+    try {
+      const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ chat_id:chatid, text:msg, parse_mode:'HTML' })
+      });
+      const d = await r.json();
+      if (!d.ok) throw new Error(d.description);
+    } catch(e) { console.warn('Telegram:', e); }
+  },
+
+  async testTelegram() {
+    this.saveTgSettings();
+    const { token, chatid } = this.settings;
+    if (!token || !chatid) { this.toast('err', '❌ Điền token và chat ID trước'); return; }
+    this.toast('inf', '📡 Đang gửi...');
+    const ok = await this.sendTelegram('✅ <b>TaskFlow</b>\nKết nối Telegram thành công!').then(()=>true).catch(()=>false);
+    ok
+      ? this.toast('ok', '✅ Telegram kết nối thành công!')
+      : this.toast('err', '❌ Gửi thất bại. Kiểm tra Token & Chat ID');
+  },
+
+  /* ─── EXPORT ─── */
+  exportCSV() {
+    const h = ['ID','Khách hàng','Điện thoại','Email','Đề bài','Thời lượng','Giá','Trạng thái','Ghi chú','Ngày tạo'];
+    const rows = this.tasks.map(t => [
+      t.id, t.customerName, t.customerPhone, t.customerEmail,
+      t.title, t.duration, t.price, STATUSES[t.status]?.label,
+      t.notes, this.fmtDate(t.createdAt)
+    ].map(v => `"${(v||'').toString().replace(/"/g,'""')}"`));
+    const csv = [h, ...rows].map(r => r.join(',')).join('\n');
+    const blob = new Blob(['\uFEFF'+csv], { type:'text/csv;charset=utf-8' });
+    dlBlob(blob, 'taskflow-export.csv');
+    this.toast('ok', '📊 Đã xuất CSV');
+  },
+
+  async clearAll() {
+    if (!confirm('Xoá toàn bộ dữ liệu? Không thể hoàn tác!')) return;
+    for (const t of this.tasks) { try { await API.remove(t.id); } catch(e) {} }
+    this.tasks = [];
+    this.render();
+    this.toast('warn', '🗑 Đã xoá toàn bộ');
+  },
+
+  /* ─── TOAST ─── */
+  toast(type, msg, dur=3500) {
+    const c = document.getElementById('toast-c');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.innerHTML = `<span style="flex:1">${msg}</span><button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:14px">✕</button>`;
+    c.appendChild(el);
+    setTimeout(() => {
+      el.style.animation = 'tout .2s ease forwards';
+      setTimeout(() => el.remove(), 200);
+    }, dur);
+  },
+
+  /* ─── UTILS ─── */
+  fmt(n) {
+    if (!n) return '0đ';
+    return new Intl.NumberFormat('vi-VN').format(n) + 'đ';
+  },
+  fmtDate(d) {
+    if (!d) return '—';
+    return new Date(d).toLocaleDateString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric' });
+  }
+};
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtSize(b) { if (b<1024) return b+'B'; if (b<1048576) return (b/1024).toFixed(1)+'KB'; return (b/1048576).toFixed(1)+'MB'; }
+function dlBlob(blob, name) { const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:name}); a.click(); URL.revokeObjectURL(a.href); }
+
+// Fix API.status missing closing paren (syntax issue workaround)
+API.status = async (id,s) => {
+  const r = await fetch(`/api/tasks/${id}/status`, {
+    method:'PATCH',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({status:s})
+  });
+  return r.json();
+};
+
+app.init();
+</script>
+</body>
+</html>

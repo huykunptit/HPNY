@@ -441,14 +441,53 @@ const STATUSES = {
 };
 
 /* ═══════════════════════════════════════
-   API LAYER
+   STORAGE LAYER (localStorage — pure client-side)
 ═══════════════════════════════════════ */
+const STORAGE_KEY = 'tf_tasks';
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+const readAll = () => {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+  catch { return []; }
+};
+const writeAll = (tasks) => localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+
 const API = {
-  async get()           { return fetch('/api/tasks').then(r=>r.json()) },
-  async create(data)    { return fetch('/api/tasks',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()) },
-  async update(id,data) { return fetch(`/api/tasks/${id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json()) },
-  async status(id,s)    { return fetch(`/api/tasks/${id}/status`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:s})).then(r=>r.json()) },
-  async remove(id)      { return fetch(`/api/tasks/${id}`,{method:'DELETE'}).then(r=>r.json()) },
+  async get() {
+    return readAll();
+  },
+  async create(data) {
+    const tasks = readAll();
+    const now = new Date().toISOString();
+    const task = { ...data, id: uid(), createdAt: now, updatedAt: now };
+    tasks.unshift(task);
+    writeAll(tasks);
+    return task;
+  },
+  async update(id, data) {
+    const tasks = readAll();
+    const idx = tasks.findIndex(t => t.id === id);
+    if (idx === -1) throw new Error('Not found');
+    tasks[idx] = { ...tasks[idx], ...data, id, updatedAt: new Date().toISOString() };
+    writeAll(tasks);
+    return tasks[idx];
+  },
+  async status(id, s) {
+    const tasks = readAll();
+    const idx = tasks.findIndex(t => t.id === id);
+    if (idx === -1) throw new Error('Not found');
+    const old = tasks[idx].status;
+    tasks[idx].status = s;
+    tasks[idx].updatedAt = new Date().toISOString();
+    writeAll(tasks);
+    return { task: tasks[idx], old };
+  },
+  async remove(id) {
+    const tasks = readAll();
+    const next = tasks.filter(t => t.id !== id);
+    if (next.length === tasks.length) throw new Error('Not found');
+    writeAll(next);
+    return { ok: true };
+  },
 };
 
 /* ═══════════════════════════════════════
@@ -1028,16 +1067,6 @@ const app = {
 function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function fmtSize(b) { if (b<1024) return b+'B'; if (b<1048576) return (b/1024).toFixed(1)+'KB'; return (b/1048576).toFixed(1)+'MB'; }
 function dlBlob(blob, name) { const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:name}); a.click(); URL.revokeObjectURL(a.href); }
-
-// Fix API.status missing closing paren (syntax issue workaround)
-API.status = async (id,s) => {
-  const r = await fetch(`/api/tasks/${id}/status`, {
-    method:'PATCH',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({status:s})
-  });
-  return r.json();
-};
 
 app.init();
 </script>

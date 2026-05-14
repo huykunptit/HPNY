@@ -1,68 +1,28 @@
 # ✦ TaskFlow — Quản Lý Đơn Hàng
 
-Ứng dụng quản lý đơn hàng / khách hàng dạng Notion với Kanban kéo thả và thông báo Telegram.
+Ứng dụng quản lý đơn hàng / khách hàng dạng Notion với Kanban kéo thả và thông báo Telegram. Pure HTML/CSS/JS — không cần server.
 
 ## Chạy local
 
+Mở thẳng `index.html` trong trình duyệt, hoặc serve bằng bất kỳ static server nào:
+
 ```bash
-npm install
-npm start
+python3 -m http.server 3000
 # Mở http://localhost:3000
 ```
 
-## Deploy lên Vercel
+## Deploy
 
-```bash
-npm install -g vercel
-vercel login
-vercel --prod
-```
+- **Vercel**: kéo thả thư mục hoặc kết nối Git repo — không cần build, không cần config.
+- **GitHub Pages**: push lên branch chính, bật Pages trong Settings.
+- **Netlify / Cloudflare Pages**: drag-and-drop thư mục.
 
-> ⚠️ **Lưu ý Vercel**: Vercel dùng serverless functions, filesystem chỉ ghi được vào `/tmp` và sẽ **reset khi cold start**. Dữ liệu không bền vĩnh. Nếu cần lưu lâu dài trên Vercel, hãy dùng [Vercel KV](https://vercel.com/storage/kv) hoặc một database bên ngoài.
+## Lưu trữ dữ liệu
 
-## Deploy lên Heroku
+Toàn bộ đơn hàng được lưu trong **`localStorage`** của trình duyệt:
 
-```bash
-# Cần có Heroku CLI
-heroku login
-heroku create ten-app-cua-ban
-git init && git add . && git commit -m "init"
-heroku git:remote -a ten-app-cua-ban
-git push heroku main
-```
-
-> ⚠️ **Lưu ý Heroku**: File `data/tasks.json` được lưu trong dyno, sẽ **reset khi deploy lại hoặc dyno restart** (mỗi ~24h trên plan miễn phí). Backup dữ liệu thường xuyên bằng nút "Xuất CSV".
-
-## Lưu trữ bền vĩnh (Production)
-
-Thay thế file JSON bằng một database thực sự:
-- **Supabase** (PostgreSQL, miễn phí): thêm gói `@supabase/supabase-js`
-- **MongoDB Atlas** (NoSQL, miễn phí): thêm gói `mongoose`
-- **Railway** (PostgreSQL): kéo thả deploy
-
-## Cấu trúc project
-
-```
-taskflow/
-├── server.js          ← Express API + serve frontend
-├── package.json
-├── vercel.json        ← Config Vercel
-├── Procfile           ← Config Heroku
-├── data/
-│   └── tasks.json     ← Dữ liệu (tự tạo khi chạy)
-└── public/
-    └── index.html     ← Toàn bộ frontend
-```
-
-## API Endpoints
-
-| Method | Path | Mô tả |
-|--------|------|--------|
-| GET | /api/tasks | Lấy tất cả đơn hàng |
-| POST | /api/tasks | Tạo đơn mới |
-| PUT | /api/tasks/:id | Cập nhật đơn |
-| PATCH | /api/tasks/:id/status | Đổi trạng thái (kéo thả) |
-| DELETE | /api/tasks/:id | Xoá đơn |
+- Dữ liệu nằm trên từng máy / từng trình duyệt, không đồng bộ giữa thiết bị.
+- Xoá cache trình duyệt = mất data → backup thường xuyên bằng nút **"Xuất CSV"**.
 
 ## Telegram Bot
 

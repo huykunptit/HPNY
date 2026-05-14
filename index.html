@@ -266,7 +266,7 @@ tr.drow:hover .acts{opacity:1}
           <th style="width:28px">#</th>
           <th>Khách hàng</th>
           <th>Đề bài</th>
-          <th>Thời lượng</th>
+          <th>Deadline</th>
           <th>Giá</th>
           <th>Trạng thái</th>
           <th>Ngày tạo</th>
@@ -354,7 +354,7 @@ tr.drow:hover .acts{opacity:1}
         <div class="fgrp-title">📝 Thông tin đơn hàng</div>
         <div class="fg full"><label class="flbl">Đề bài *</label><input class="fi" id="f-title" placeholder="Tên đề bài / dự án"></div>
         <div class="fg full"><label class="flbl">Mô tả chi tiết</label><textarea class="fta" id="f-desc" placeholder="Mô tả yêu cầu..."></textarea></div>
-        <div class="fg"><label class="flbl">Thời lượng</label><input class="fi" id="f-dur" placeholder="3 ngày, 1 tuần..."></div>
+        <div class="fg"><label class="flbl">Deadline</label><input class="fi" id="f-dur" type="date"></div>
         <div class="fg"><label class="flbl">Giá (VNĐ)</label><input class="fi" id="f-price" type="number" placeholder="500000"></div>
         <div class="fg full"><label class="flbl">Ghi chú nội bộ</label><textarea class="fta" id="f-notes" placeholder="Ghi chú..."></textarea></div>
         <div class="fg">
@@ -372,7 +372,7 @@ tr.drow:hover .acts{opacity:1}
         <div class="fg full">
           <div class="fupload">
             <input type="file" multiple id="f-attach" onchange="app.handleFiles('attach',this.files)">
-            <div class="fupload-txt"><strong>Kéo thả hoặc click để tải file</strong>Tối đa 2MB / file</div>
+            <div class="fupload-txt"><strong>Kéo thả hoặc click để tải file</strong>Tối đa 10MB / file</div>
           </div>
           <div class="flist" id="attach-list"></div>
         </div>
@@ -388,7 +388,7 @@ tr.drow:hover .acts{opacity:1}
           <div id="sub-file-area" style="display:none">
             <div class="fupload">
               <input type="file" multiple id="f-sub-files" onchange="app.handleFiles('sub',this.files)">
-              <div class="fupload-txt"><strong>File bài gửi cho khách</strong>Tối đa 2MB / file</div>
+              <div class="fupload-txt"><strong>File bài gửi cho khách</strong>Tối đa 10MB / file</div>
             </div>
             <div class="flist" id="sub-list"></div>
           </div>
@@ -582,7 +582,7 @@ const app = {
         <td style="color:var(--t3);font-size:11px">${i+1}</td>
         <td class="cust-cell"><strong>${esc(t.customerName||'—')}</strong><span>${esc(t.customerPhone||t.customerEmail||'')}</span></td>
         <td class="title-c">${esc(t.title||'—')}</td>
-        <td style="color:var(--t2);font-size:12px">${esc(t.duration||'—')}</td>
+        <td style="color:var(--t2);font-size:12px">${this.fmtDeadline(t.deadline)}</td>
         <td class="price-c">${t.price ? this.fmt(t.price) : '—'}</td>
         <td><span class="badge ${STATUSES[t.status]?.cls||'b-todo'}">${STATUSES[t.status]?.label||t.status}</span></td>
         <td style="color:var(--t2);font-size:11px">${this.fmtDate(t.createdAt)}</td>
@@ -642,7 +642,7 @@ const app = {
         <div class="kcard-cust">👤 ${esc(t.customerName||'—')}</div>
         <div class="kcard-ft">
           <span class="kcard-price">${t.price ? this.fmt(t.price) : '—'}</span>
-          <span class="kcard-dur">${esc(t.duration||'')}</span>
+          <span class="kcard-dur">${this.fmtDeadline(t.deadline,true)}</span>
         </div>
       </div>`;
   },
@@ -756,7 +756,7 @@ const app = {
     document.getElementById('modal-title').textContent = 'Chỉnh sửa đơn hàng';
     document.getElementById('delete-btn').style.display = 'flex';
     ['name','phone','email','social','title','desc','dur','notes','sub-text'].forEach(k => {
-      const map = {name:'customerName',phone:'customerPhone',email:'customerEmail',social:'customerSocial',title:'title',desc:'description',dur:'duration',notes:'notes','sub-text':'submissionText'};
+      const map = {name:'customerName',phone:'customerPhone',email:'customerEmail',social:'customerSocial',title:'title',desc:'description',dur:'deadline',notes:'notes','sub-text':'submissionText'};
       const el = document.getElementById('f-'+k);
       if (el) el.value = t[map[k]] || '';
     });
@@ -794,7 +794,7 @@ const app = {
       customerSocial: document.getElementById('f-social').value.trim(),
       title,
       description:    document.getElementById('f-desc').value.trim(),
-      duration:       document.getElementById('f-dur').value.trim(),
+      deadline:       document.getElementById('f-dur').value,
       price:          parseFloat(document.getElementById('f-price').value) || 0,
       notes:          document.getElementById('f-notes').value.trim(),
       status:         document.getElementById('f-status').value,
@@ -822,7 +822,7 @@ const app = {
         this.tasks.unshift(created);
         this.toast('ok', '✅ Đã thêm đơn hàng mới');
         if (this.settings.notiNew) {
-          this.sendTelegram(`📋 <b>Đơn hàng mới</b>\n👤 ${created.customerName}\n📌 ${created.title}\n⏱ ${created.duration||'—'} | 💰 ${this.fmt(created.price)}`);
+          this.sendTelegram(`📋 <b>Đơn hàng mới</b>\n👤 ${created.customerName}\n📌 ${created.title}\n⏰ ${this.fmtDeadline(created.deadline)} | 💰 ${this.fmt(created.price)}`);
         }
       }
       this.render();
@@ -878,7 +878,7 @@ const app = {
       { l:'Email', v:t.customerEmail||'—' },
       { l:'Mạng XH / Link', v:t.customerSocial||'—' },
       { l:'Mô tả', v:t.description||'—', full:true },
-      { l:'Thời lượng', v:t.duration||'—' },
+      { l:'Deadline', v:this.fmtDeadline(t.deadline) },
       { l:'Giá', v:t.price ? this.fmt(t.price)+'đ' : '—' },
       { l:'Ghi chú', v:t.notes||'—', full:true },
       { l:'File đi kèm', v:t.attachments?.length ? t.attachments.map(f=>`📎 ${esc(f.name)}`).join('\n') : 'Không có', full:true },
@@ -931,7 +931,7 @@ const app = {
   handleFiles(type, files) {
     const list = type === 'attach' ? this.attachFiles : this.subFiles;
     Array.from(files).forEach(f => {
-      if (f.size > 2*1024*1024) { this.toast('warn', `⚠ ${f.name} vượt 2MB`); return; }
+      if (f.size > 10*1024*1024) { this.toast('warn', `⚠ ${f.name} vượt 10MB`); return; }
       const reader = new FileReader();
       reader.onload = e => {
         list.push({ name:f.name, size:f.size, type:f.type, base64:e.target.result });
@@ -1020,10 +1020,10 @@ const app = {
 
   /* ─── EXPORT ─── */
   exportCSV() {
-    const h = ['ID','Khách hàng','Điện thoại','Email','Đề bài','Thời lượng','Giá','Trạng thái','Ghi chú','Ngày tạo'];
+    const h = ['ID','Khách hàng','Điện thoại','Email','Đề bài','Deadline','Giá','Trạng thái','Ghi chú','Ngày tạo'];
     const rows = this.tasks.map(t => [
       t.id, t.customerName, t.customerPhone, t.customerEmail,
-      t.title, t.duration, t.price, STATUSES[t.status]?.label,
+      t.title, this.fmtDeadline(t.deadline), t.price, STATUSES[t.status]?.label,
       t.notes, this.fmtDate(t.createdAt)
     ].map(v => `"${(v||'').toString().replace(/"/g,'""')}"`));
     const csv = [h, ...rows].map(r => r.join(',')).join('\n');
@@ -1061,6 +1061,18 @@ const app = {
   fmtDate(d) {
     if (!d) return '—';
     return new Date(d).toLocaleDateString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric' });
+  },
+  fmtDeadline(d, compact=false) {
+    if (!d) return compact ? '' : '—';
+    const dt = new Date(d + 'T23:59:59');
+    if (isNaN(dt)) return compact ? '' : '—';
+    const txt = dt.toLocaleDateString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric' });
+    const diff = Math.ceil((dt - new Date()) / 86400000);
+    let suffix = '';
+    if (diff < 0)       suffix = ` (quá ${-diff}d)`;
+    else if (diff === 0) suffix = ' (hôm nay)';
+    else if (diff <= 3)  suffix = ` (còn ${diff}d)`;
+    return txt + suffix;
   }
 };
 
